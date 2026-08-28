@@ -9,7 +9,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     const { count: gpsCount, data: gpsSample, error: gpsError } = await supabase
       .from("gps_reports")
       .select("*", { count: "exact" })
-      .limit(2);
+      .limit(2); //comment sample
     
     return res.status(200).json({
       database: "Supabase",
