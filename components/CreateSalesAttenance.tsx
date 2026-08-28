@@ -504,13 +504,13 @@ export default function CreateSalesAttendance({
   return (
     <Dialog open={open} onOpenChange={onOpenChangeAction}>
       <DialogContent
-        className="p-0 rounded-[28px] max-w-sm w-full mx-auto border-0 shadow-2xl max-h-[92vh] flex flex-col"
+        className="p-0 rounded-[28px] max-w-sm w-full mx-auto border-0 shadow-[0_8px_40px_rgba(0,0,0,0.18)] max-h-[92vh] flex flex-col"
       >
         <VisuallyHidden>
           <DialogTitle>Site Visit Log</DialogTitle>
         </VisuallyHidden>
         {/* ── Header ── */}
-        <div className="bg-brand-primary px-6 pt-5 pb-5 flex-shrink-0">
+        <div className="clay-card-brand rounded-none px-6 pt-5 pb-5 flex-shrink-0">
           <div className="flex items-center gap-3 mb-5">
             <button
               onClick={() => onOpenChangeAction(false)}
@@ -618,7 +618,7 @@ export default function CreateSalesAttendance({
                             }
                           }}
                           className={[
-                            "rounded-2xl border-[1.5px] p-4 flex flex-col items-center gap-2 transition-all",
+                            "clay-card p-4 flex flex-col items-center gap-2 transition-all active:scale-95",
                             isSelected
                               ? isNew
                                 ? "bg-[#E6F1FB] border-[#185FA5]"
@@ -667,7 +667,7 @@ export default function CreateSalesAttendance({
                         value={formData.company_name || ""}
                         onChange={(e) => onChangeAction("company_name", e.target.value)}
                         placeholder="Enter company name..."
-                        className="w-full rounded-2xl border border-gray-200 bg-white px-4 py-3 text-[13px] text-gray-800 outline-none focus:border-brand-primary transition-all"
+                        className="w-full clay-card px-4 py-3 text-[13px] text-gray-800 outline-none focus:ring-2 focus:ring-[var(--brand-primary)]/10 transition-all"
                       />
                     </div>
                     <div className="grid grid-cols-2 gap-3">
@@ -680,7 +680,7 @@ export default function CreateSalesAttendance({
                           value={formData.contact_person || ""}
                           onChange={(e) => onChangeAction("contact_person", e.target.value)}
                           placeholder="Name..."
-                          className="w-full rounded-2xl border border-gray-200 bg-white px-4 py-3 text-[13px] text-gray-800 outline-none focus:border-brand-primary transition-all"
+                          className="w-full clay-card px-4 py-3 text-[13px] text-gray-800 outline-none focus:ring-2 focus:ring-[var(--brand-primary)]/10 transition-all"
                         />
                       </div>
                       <div>
@@ -692,7 +692,7 @@ export default function CreateSalesAttendance({
                           value={formData.contact_number || ""}
                           onChange={(e) => onChangeAction("contact_number", e.target.value)}
                           placeholder="Phone..."
-                          className="w-full rounded-2xl border border-gray-200 bg-white px-4 py-3 text-[13px] text-gray-800 outline-none focus:border-brand-primary transition-all"
+                          className="w-full clay-card px-4 py-3 text-[13px] text-gray-800 outline-none focus:ring-2 focus:ring-[var(--brand-primary)]/10 transition-all"
                         />
                       </div>
                     </div>
@@ -705,7 +705,7 @@ export default function CreateSalesAttendance({
                         value={formData.email_address || ""}
                         onChange={(e) => onChangeAction("email_address", e.target.value)}
                         placeholder="client@email.com..."
-                        className="w-full rounded-2xl border border-gray-200 bg-white px-4 py-3 text-[13px] text-gray-800 outline-none focus:border-brand-primary transition-all"
+                        className="w-full clay-card px-4 py-3 text-[13px] text-gray-800 outline-none focus:ring-2 focus:ring-[var(--brand-primary)]/10 transition-all"
                       />
                     </div>
                     <div>
@@ -717,7 +717,7 @@ export default function CreateSalesAttendance({
                         onChange={(e) => onChangeAction("address", e.target.value)}
                         placeholder="Company address..."
                         rows={2}
-                        className="w-full rounded-2xl border border-gray-200 bg-white px-4 py-3 text-[13px] text-gray-800 outline-none focus:border-brand-primary transition-all resize-none"
+                        className="w-full clay-card px-4 py-3 text-[13px] text-gray-800 outline-none focus:ring-2 focus:ring-[var(--brand-primary)]/10 transition-all resize-none"
                       />
                     </div>
                   </div>
@@ -756,7 +756,7 @@ export default function CreateSalesAttendance({
                         <span className="text-[12px] text-brand-primary">{accountsError}</span>
                       </div>
                     ) : (
-                      <div className="rounded-2xl border border-gray-200 bg-white relative">
+                      <div className="clay-card relative">
                         <Select
                           options={siteVisitAccounts.map((a) => ({
                             value: a.company_name,
@@ -837,7 +837,7 @@ export default function CreateSalesAttendance({
                     onChange={(e) => onChangeAction("Remarks", e.target.value)}
                     placeholder="Add notes or feedback (optional)..."
                     rows={3}
-                    className="w-full rounded-2xl border border-gray-200 bg-white px-4 py-3 text-[13px] text-gray-800 placeholder:text-gray-300 resize-none outline-none focus:border-brand-primary focus:ring-2 focus:ring-brand-primary/10 transition-all"
+                    className="w-full clay-card px-4 py-3 text-[13px] text-gray-800 placeholder:text-gray-300 resize-none outline-none focus:ring-2 focus:ring-[var(--brand-primary)]/10 transition-all"
                   />
                 </div>
 
@@ -846,8 +846,8 @@ export default function CreateSalesAttendance({
                   <p className="text-[11px] font-semibold text-gray-400 uppercase tracking-widest mb-2">
                     📍 Location
                   </p>
-                  <div className="rounded-2xl border border-gray-200 bg-white p-4 flex gap-3 items-start">
-                    <div className="w-9 h-9 rounded-xl bg-brand-light flex items-center justify-center flex-shrink-0">
+                  <div className="clay-card p-4 flex gap-3 items-start">
+                    <div className="clay-icon w-9 h-9 rounded-xl bg-[var(--brand-light)] flex items-center justify-center flex-shrink-0">
                       <MapPin size={16} className="text-brand-primary" />
                     </div>
                     <div className="flex-1 min-w-0">
@@ -906,8 +906,8 @@ export default function CreateSalesAttendance({
                     isSubmitDisabled
                       ? "bg-gray-100 text-gray-300 cursor-not-allowed"
                       : isLogout
-                        ? "bg-brand-primary text-white hover:bg-brand-primary-hover active:scale-[0.98] shadow-lg shadow-brand-primary/20"
-                        : "bg-[#1A7A4A] text-white hover:bg-[#155f38] active:scale-[0.98] shadow-lg shadow-green-200",
+                        ? "clay-btn bg-[var(--brand-primary)] text-white active:scale-[0.98]"
+                        : "clay-btn bg-[#1A7A4A] text-white active:scale-[0.98]",
                   ].join(" ")}
                 >
                   {loading ? (

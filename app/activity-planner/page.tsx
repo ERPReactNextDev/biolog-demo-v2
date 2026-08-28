@@ -11,7 +11,7 @@ import ProtectedPageWrapper from "@/components/protected-page-wrapper";
 import { motion, useInView } from "framer-motion";
 import { toast } from "sonner";
 import { type DateRange } from "react-day-picker";
-import { MapPin, X, CalendarCheck, ChevronLeft, ChevronRight, ArrowLeft, Building2, Home, BarChart3, User, LogIn, LogOut, TrendingUp, Plus, FileSpreadsheet, CalendarIcon, Clock, Megaphone, ChevronRight as ArrowRight, Power, Cloud, CloudUpload, WifiOff, Sun, CloudRain, CloudLightning, Fingerprint, Smartphone, Laptop, Globe, ShieldCheck, Trash2, Settings, Users, ShieldAlert, Download, Loader2, FileDown } from "lucide-react";
+import { MapPin, MessageSquare, X, CalendarCheck, ChevronLeft, ChevronRight, ArrowLeft, Building2, Home, BarChart3, User, LogIn, LogOut, TrendingUp, Plus, FileSpreadsheet, CalendarIcon, Clock, Megaphone, ChevronRight as ArrowRight, Power, Cloud, CloudUpload, WifiOff, Sun, CloudRain, CloudLightning, Fingerprint, Smartphone, Laptop, Globe, ShieldCheck, Trash2, Settings, Users, ShieldAlert, Download, Loader2, FileDown } from "lucide-react";
 
 import { toDateKeyPH, getPHHour, formatPHDate, formatPHTimeStr, formatPHDateTime, setPHTime, phTodayAsLocalDate } from "@/lib/ph-time";
 import { useOfflineSync } from "@/hooks/useOfflineSync";
@@ -29,6 +29,7 @@ const ActivityDialog        = dynamic(() => import("@/components/dashboard-dialo
 const CreateAttendance      = dynamic(() => import("@/components/CreateAttendance"),     { ssr: false });
 const CreateSalesAttendance = dynamic(() => import("@/components/CreateSalesAttenance"), { ssr: false });
 const CameraLazy            = dynamic(() => import("@/components/camera"),              { ssr: false });
+const MessagingPage           = dynamic(() => import("@/app/messaging/page"),          { ssr: false });
 
 // ── Location helpers for reverse geocoding ───────────────────────────────────
 
@@ -153,7 +154,7 @@ function LocationDisplay({
         </div>
       ) : (
         <>
-          <span className="truncate max-w-[180px]">
+          <span className="break-words">
             {displayLocation || "No location"}
           </span>
           {isCoords && originalCoords && (
@@ -173,7 +174,19 @@ function LocationDisplay({
 const WEATHER_CACHE_KEY = "acculog_weather";
 const WEATHER_CACHE_TTL = 30 * 60 * 1000; // 30 minutes
 
-function WeatherDisplay() {
+// Derive hero gradient palette from OWM icon code
+function getWeatherPalette(iconCode: string): { from: string; to: string } | null {
+  if (!iconCode) return null;
+  if (iconCode.includes("01")) return null; // sunny — keep brand red
+  if (iconCode.includes("02")) return { from: "#E07B1A", to: "#C06010" }; // partly cloudy → warm orange
+  if (iconCode.includes("03") || iconCode.includes("04")) return { from: "#5B7BA8", to: "#3D5A80" }; // overcast → steel blue
+  if (iconCode.includes("09") || iconCode.includes("10")) return { from: "#2563EB", to: "#1E40AF" }; // rain → blue
+  if (iconCode.includes("11")) return { from: "#4F46E5", to: "#312E81" }; // thunder → indigo
+  if (iconCode.includes("13")) return { from: "#64748B", to: "#475569" }; // snow → slate
+  if (iconCode.includes("50")) return { from: "#6B7280", to: "#4B5563" }; // fog/mist → gray
+  return null;
+}
+function WeatherDisplay({ onWeather }: { onWeather?: (icon: string) => void }) {
   const [weather, setWeather] = useState<{ temp: number; icon: string } | null>(null);
 
   useEffect(() => {
@@ -184,6 +197,7 @@ function WeatherDisplay() {
         const { data, ts } = JSON.parse(cached);
         if (Date.now() - ts < WEATHER_CACHE_TTL) {
           setWeather(data);
+          onWeather?.(data.icon);
           return;
         }
       }
@@ -199,6 +213,7 @@ function WeatherDisplay() {
         if (data.main) {
           const w = { temp: Math.round(data.main.temp), icon: data.weather[0].icon };
           setWeather(w);
+          onWeather?.(w.icon);
           try { sessionStorage.setItem(WEATHER_CACHE_KEY, JSON.stringify({ data: w, ts: Date.now() })); } catch { /* quota */ }
         }
       } catch { /* non-critical */ }
@@ -224,7 +239,7 @@ function WeatherDisplay() {
 
 
   return (
-    <div className="flex items-center gap-1.5 bg-white/10 backdrop-blur-md rounded-full px-2.5 py-1 border border-white/10 shadow-sm">
+    <div className="clay-pill flex items-center gap-1.5 bg-white/20 backdrop-blur-md rounded-full px-2.5 py-1">
       <WeatherIcon />
       <span className="text-[11px] font-bold text-white">{weather.temp}°C</span>
     </div>
@@ -233,7 +248,7 @@ function WeatherDisplay() {
 
 // ── Helpers ─────────────────────────────────────────────────────────────────────
 
-type ActiveTab = "home" | "calendar" | "reports" | "profile" | "admin";
+type ActiveTab = "home" | "calendar" | "messaging" | "reports" | "profile" | "admin";
 
 type TimelineItem = {
   id: string;
@@ -392,7 +407,7 @@ function TimelineItemComponent({ item, index }: { item: TimelineItem; index: num
         transition={{ delay: index * 0.12, duration: 0.25 }}
         className="flex-shrink-0 flex flex-col items-center"
       >
-        <div className="w-7 h-7 rounded-xl flex items-center justify-center" style={{ background: bgColor }}>
+        <div className="clay-icon w-7 h-7 rounded-xl flex items-center justify-center" style={{ background: bgColor }}>
           {isLogin ? <LogIn size={12} style={{ color: iconColor }} /> :
             item.status === "Logout" ? <LogOut size={12} style={{ color: iconColor }} /> :
               isMeeting ? <Users size={12} style={{ color: iconColor }} /> :
@@ -404,7 +419,7 @@ function TimelineItemComponent({ item, index }: { item: TimelineItem; index: num
         initial={{ opacity: 0, x: -12 }}
         animate={inView ? { opacity: 1, x: 0 } : undefined}
         transition={{ delay: index * 0.12 + 0.15, type: "spring", stiffness: 300, damping: 25 }}
-        className="flex-1 bg-white rounded-2xl border border-gray-100 px-3 py-2.5 mb-2.5"
+        className="clay-card flex-1 px-3 py-2.5 mb-2.5"
       >
         <div className="flex items-center justify-between">
           <span className="text-[10px] font-semibold uppercase tracking-wider" style={{ color: iconColor }}>
@@ -438,9 +453,9 @@ function TimesheetNavCard({ userId }: { userId: string | null | undefined }) {
   return (
     <button
       onClick={() => router.push(href)}
-      className="w-full flex items-center gap-4 bg-white rounded-2xl border border-gray-100 px-4 py-4 text-left hover:border-[var(--brand-primary)]/30 hover:bg-[var(--brand-light)] active:scale-[0.98] transition-all group shadow-sm"
+      className="w-full flex items-center gap-4 clay-card px-4 py-4 text-left active:scale-[0.98] transition-all group"
     >
-      <div className="w-11 h-11 rounded-[14px] bg-[var(--brand-light)] flex items-center justify-center flex-shrink-0 group-hover:bg-[var(--brand-primary)] transition-colors">
+      <div className="clay-icon w-11 h-11 rounded-[14px] bg-[var(--brand-light)] flex items-center justify-center flex-shrink-0 group-hover:bg-[var(--brand-primary)] transition-colors">
         <FileSpreadsheet size={20} className="text-[var(--brand-primary)] group-hover:text-white transition-colors" />
       </div>
       <div className="flex-1 min-w-0">
@@ -454,6 +469,58 @@ function TimesheetNavCard({ userId }: { userId: string | null | undefined }) {
   );
 }
 
+// ── Rain Overlay ─────────────────────────────────────────────────────────────
+
+function RainOverlay({ iconCode }: { iconCode: string }) {
+  const isRain      = iconCode.includes("09") || iconCode.includes("10");
+  const isThunder   = iconCode.includes("11");
+  const isSnow      = iconCode.includes("13");
+  const active      = isRain || isThunder || isSnow;
+
+  if (!active) return null;
+
+  // Deterministic drop layout — seeded so it looks the same on every render
+  const drops = Array.from({ length: isSnow ? 18 : 28 }, (_, i) => {
+    const left     = ((i * 37 + 11) % 100);           // 0‑99 %
+    const delay    = ((i * 13 + 7)  % 30) / 10;       // 0‑2.9 s
+    const duration = isSnow
+      ? 2.5 + ((i * 7) % 20) / 10                      // 2.5–4.4 s (slow)
+      : 0.55 + ((i * 9) % 15) / 100;                   // 0.55–0.69 s (fast)
+    const height   = isSnow ? 5 : (10 + (i * 5) % 14); // px
+    const opacity  = 0.35 + ((i * 11) % 40) / 100;
+    return { left, delay, duration, height, opacity };
+  });
+
+  return (
+    <div className="absolute inset-0 overflow-hidden pointer-events-none z-[1]">
+      {/* Thunder flash layer */}
+      {isThunder && (
+        <div
+          className="rain-thunder-flash absolute inset-0 bg-white rounded-b-[36px]"
+          style={{ animationDelay: `${(Math.random() * 4).toFixed(1)}s` }}
+        />
+      )}
+
+      {drops.map((d, i) => (
+        <div
+          key={i}
+          className="rain-drop"
+          style={{
+            left:              `${d.left}%`,
+            top:               "-10px",
+            height:            `${d.height}px`,
+            opacity:           d.opacity,
+            animationDuration: `${d.duration}s`,
+            animationDelay:    `${d.delay}s`,
+            // Snow: rounder & wider
+            ...(isSnow ? { width: "3px", borderRadius: "50%", height: "3px",
+                           background: "rgba(255,255,255,0.7)" } : {}),
+          }}
+        />
+      ))}
+    </div>
+  );
+}
 // ── Home Tab ──────────────────────────────────────────────────────────────────
 
 function HomeTab({
@@ -474,6 +541,8 @@ function HomeTab({
   const greeting = phHour < 12 ? "Good morning" : phHour < 17 ? "Good afternoon" : "Good evening";
   const presentRate = monthlyStats.total > 0 ? Math.round((monthlyStats.present / monthlyStats.total) * 100) : 0;
   const initials = userDetails ? `${userDetails.Firstname[0] ?? ""}${userDetails.Lastname[0] ?? ""}`.toUpperCase() : "?";
+  const [weatherIcon, setWeatherIcon] = useState<string>("");
+  const weatherPalette = getWeatherPalette(weatherIcon);
 
   const [systemSettings, setSystemSettings] = useState({
     officeStartTime: "08:00",
@@ -518,9 +587,14 @@ function HomeTab({
 
   return (
     <div className="flex flex-col h-full">
-      <div className="relative px-5 pt-12 pb-8 overflow-hidden flex-shrink-0" style={{ background: "linear-gradient(145deg,var(--brand-primary) 0%,var(--brand-primary-hover) 100%)" }}>
+      <div
+        className="clay-card-brand rounded-b-[36px] relative px-5 pt-5 pb-8 overflow-hidden flex-shrink-0"
+        style={weatherPalette ? { background: `linear-gradient(145deg, ${weatherPalette.from} 0%, ${weatherPalette.to} 100%)` } : undefined}
+      >
         <div className="absolute -top-10 -right-10 w-40 h-40 rounded-full bg-white/5 pointer-events-none" />
         <div className="absolute -bottom-16 -left-6 w-52 h-52 rounded-full bg-white/[0.03] pointer-events-none" />
+        <RainOverlay iconCode={weatherIcon} />
+        <img src="/3d/banner-home.png" alt="" className="absolute -bottom-5 -right-2 h-[85%] max-h-[180px] w-auto object-contain object-right-bottom pointer-events-none z-[2] opacity-95 select-none drop-shadow-xl" />
         <div className="relative z-10">
           <div className="flex items-center justify-between mb-4">
             <div className="flex items-center gap-2">
@@ -537,23 +611,20 @@ function HomeTab({
               </div>
               <span className="text-white text-[14px] font-black tracking-[0.1em]">BIOLOG</span>
             </div>
-            <div className="flex items-center gap-3">
-              <WeatherDisplay />
-              {userDetails?.profilePicture ? (
-                <img src={userDetails.profilePicture} alt="" className="w-9 h-9 rounded-full border-2 border-white/30 object-cover shadow-sm" />
-              ) : (
-                <div className="w-9 h-9 rounded-full bg-white/20 border border-white/30 flex items-center justify-center text-white text-sm font-bold backdrop-blur-sm">{initials}</div>
-              )}
-            </div>
           </div>
-          <p className="text-white/70 text-xs mb-1">{greeting} 👋</p>
+          <div className="max-w-[60%]">
+          <p className="text-white/70 text-xs mb-1">{greeting} 👋 
+          </p>
           <h1 className="text-white uppercase text-xl font-semibold mb-0.5">{userDetails ? `${userDetails.Firstname} ${userDetails.Lastname}` : "Loading..."}</h1>
-          <p className="text-white/60 text-[12px] uppercase">{userDetails?.Role ?? "—"} · {userDetails?.Department ?? "—"}</p>
+          <p className="text-white/60 text-[12px] uppercase">{userDetails?.Role ?? "—"} · {userDetails?.Department ?? "—"}</p><div className="flex items-center gap-3">
+              <WeatherDisplay onWeather={setWeatherIcon} />
+          </div>
+          </div>
         </div>
       </div>
 
       <div className="mx-4 -mt-5 relative z-20 flex-shrink-0">
-        <div className="bg-white rounded-[22px] shadow-lg shadow-gray-200/80 border border-gray-100 p-4">
+        <div className="clay-card p-4">
           <div className="flex items-center justify-between mb-3">
             <span className="text-[10px] font-semibold text-gray-400 uppercase tracking-widest">Current Status</span>
             <span className="flex items-center gap-1.5 bg-[#EEF7F2] rounded-full px-3 py-1">
@@ -578,7 +649,7 @@ function HomeTab({
                 <Clock size={14} className="text-[var(--brand-primary)]" />
                 <p className="text-[15px] font-bold text-gray-800">{systemSettings.officeStartTime} – {systemSettings.officeEndTime}</p>
               </div>
-              <span className={`inline-flex items-center gap-1.5 mt-2 ${isLate ? "bg-[var(--brand-light)] border-red-100" : "bg-[#EEF7F2] border-green-100"} border rounded-full px-2.5 py-1`}>
+              <span className={`clay-pill inline-flex items-center gap-1.5 mt-2 ${isLate ? "bg-[var(--brand-light)]" : "bg-[#EEF7F2]"} rounded-full px-2.5 py-1`}>
                 <span className={`w-1.5 h-1.5 rounded-full ${isLate ? "bg-[var(--brand-primary)]" : "bg-[#1A7A4A]"} animate-pulse`} />
                 <span className={`text-[10px] font-bold ${isLate ? "text-[var(--brand-primary)]" : "text-[#1A7A4A]"} uppercase tracking-wider`}>
                   {isLate ? "Late" : (firstLogin ? "On Schedule" : "Not In")}
@@ -589,15 +660,15 @@ function HomeTab({
         </div>
       </div>
 
-      <div className="flex-1 overflow-y-auto px-4 pt-4 pb-28 scroll-smooth" ref={scrollRef}>
+      <div className="flex-1 overflow-y-auto px-4 pt-4 pb-36 scroll-smooth" ref={scrollRef}>
         {/* Global Announcement */}
         {systemSettings.announcement && (
           <motion.div 
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
-            className="mb-5 bg-purple-50 border border-purple-100 rounded-[22px] p-4 flex gap-4"
+            className="clay-card mb-5 bg-purple-50 p-4 flex gap-4"
           >
-            <div className="w-10 h-10 rounded-2xl bg-white flex items-center justify-center text-purple-600 flex-shrink-0 shadow-sm">
+            <div className="clay-icon w-10 h-10 rounded-2xl bg-white flex items-center justify-center text-purple-600 flex-shrink-0">
               <Megaphone size={20} />
             </div>
             <div className="flex-1 min-w-0">
@@ -611,13 +682,13 @@ function HomeTab({
         <div className="grid grid-cols-2 gap-3 mb-5">
           {(userDetails?.Role === "Admin" || userDetails?.Role === "SuperAdmin") && (
             <>
-              <button onClick={() => router.push(`/admin/tickets${userId ? `?id=${encodeURIComponent(userId)}` : ""}`)} className="bg-white rounded-[18px] p-4 text-left border border-gray-100 hover:border-gray-200 hover:bg-gray-50 active:scale-[0.97] transition-all">
-                <div className="w-9 h-9 rounded-[10px] bg-[#E6F1FB] flex items-center justify-center mb-3 border border-gray-100"><ShieldAlert size={18} className="text-[#185FA5]" /></div>
+              <button onClick={() => router.push(`/admin/tickets${userId ? `?id=${encodeURIComponent(userId)}` : ""}`)} className="clay-card p-4 text-left active:scale-[0.97] transition-all">
+                <div className="clay-icon w-9 h-9 rounded-[10px] bg-[#E6F1FB] flex items-center justify-center mb-3"><ShieldAlert size={18} className="text-[#185FA5]" /></div>
                 <p className="text-gray-800 text-[13px] font-semibold">Concerns</p>
                 <p className="text-gray-400 text-[11px] mt-0.5">Manage tickets</p>
               </button>
-              <button onClick={() => router.push(`/admin/live-tracking${userId ? `?id=${encodeURIComponent(userId)}` : ""}`)} className="bg-white rounded-[18px] p-4 text-left border border-gray-100 hover:border-gray-200 hover:bg-gray-50 active:scale-[0.97] transition-all">
-                <div className="w-9 h-9 rounded-[10px] bg-[#FDF4E7] flex items-center justify-center mb-3 border border-gray-100"><MapPin size={18} className="text-[#A0611A]" /></div>
+              <button onClick={() => router.push(`/admin/live-tracking${userId ? `?id=${encodeURIComponent(userId)}` : ""}`)} className="clay-card p-4 text-left active:scale-[0.97] transition-all">
+                <div className="clay-icon w-9 h-9 rounded-[10px] bg-[#FDF4E7] flex items-center justify-center mb-3"><MapPin size={18} className="text-[#A0611A]" /></div>
                 <p className="text-gray-800 text-[13px] font-semibold">Live Tracking</p>
                 <p className="text-gray-400 text-[11px] mt-0.5">Monitor field</p>
               </button>
@@ -625,26 +696,26 @@ function HomeTab({
           )}
           
           {userDetails?.Department === "Sales" ? (
-            <button onClick={onCreateSiteVisit} className="bg-white rounded-[18px] p-4 text-left border border-gray-100 hover:border-gray-200 hover:bg-gray-50 active:scale-[0.97] transition-all">
-              <div className="w-9 h-9 rounded-[10px] bg-[var(--brand-light)] flex items-center justify-center mb-3 border border-gray-100"><Building2 size={18} className="text-[var(--brand-primary)]" /></div>
+            <button onClick={onCreateSiteVisit} className="clay-card p-4 text-left active:scale-[0.97] transition-all">
+              <div className="clay-icon w-9 h-9 rounded-[10px] bg-[var(--brand-light)] flex items-center justify-center mb-3"><Building2 size={18} className="text-[var(--brand-primary)]" /></div>
               <p className="text-gray-800 text-[13px] font-semibold">Site Visit</p>
               <p className="text-gray-400 text-[11px] mt-0.5">Record client visit</p>
             </button>
           ) : (
-            <button onClick={onCreateAttendance} className="bg-[var(--brand-primary)] rounded-[18px] p-4 text-left hover:bg-[var(--brand-primary-hover)] active:scale-[0.97] transition-all shadow-md shadow-red-100">
-              <div className="w-9 h-9 rounded-[10px] bg-white/20 flex items-center justify-center mb-3"><CalendarCheck size={18} className="text-white" /></div>
+            <button onClick={onCreateAttendance} className="clay-card-brand p-4 text-left active:scale-[0.97] transition-all">
+              <div className="clay-icon w-9 h-9 rounded-[10px] bg-white/20 flex items-center justify-center mb-3"><CalendarCheck size={18} className="text-white" /></div>
               <p className="text-white text-[13px] font-semibold">Time In/Out</p>
               <p className="text-white/65 text-[11px] mt-0.5">Log field attendance</p>
             </button>
           )}
 
-          <button onClick={() => onSetTab("calendar")} className="bg-white rounded-[18px] p-4 text-left border border-gray-100 hover:border-gray-200 hover:bg-gray-50 active:scale-[0.97] transition-all">
-            <div className="w-9 h-9 rounded-[10px] bg-gray-50 flex items-center justify-center mb-3 border border-gray-100"><CalendarCheck size={18} className="text-gray-500" /></div>
+          <button onClick={() => onSetTab("calendar")} className="clay-card p-4 text-left active:scale-[0.97] transition-all">
+            <div className="clay-icon w-9 h-9 rounded-[10px] bg-gray-50 flex items-center justify-center mb-3"><CalendarCheck size={18} className="text-gray-500" /></div>
             <p className="text-gray-800 text-[13px] font-semibold">Calendar</p>
             <p className="text-gray-400 text-[11px] mt-0.5">View monthly logs</p>
           </button>
-          <button onClick={() => onSetTab("reports")} className="bg-white rounded-[18px] p-4 text-left border border-gray-100 hover:border-gray-200 hover:bg-gray-50 active:scale-[0.97] transition-all">
-            <div className="w-9 h-9 rounded-[10px] bg-gray-50 flex items-center justify-center mb-3 border border-gray-100"><BarChart3 size={18} className="text-gray-500" /></div>
+          <button onClick={() => onSetTab("reports")} className="clay-card p-4 text-left active:scale-[0.97] transition-all">
+            <div className="clay-icon w-9 h-9 rounded-[10px] bg-gray-50 flex items-center justify-center mb-3"><BarChart3 size={18} className="text-gray-500" /></div>
             <p className="text-gray-800 text-[13px] font-semibold">Reports</p>
             <p className="text-gray-400 text-[11px] mt-0.5">Attendance summary</p>
           </button>
@@ -956,13 +1027,13 @@ function CalendarTab({ currentMonth, calendarDays, usersMap, onEventClick, onMee
   };
 
   return (
-    <div className="flex flex-col h-full overflow-hidden bg-[#F8FAFC]">
+    <div className="flex flex-col h-full overflow-hidden clay-bg">
       {/* Header with Month Navigation */}
       <div className="px-5 pt-12 pb-4 flex-shrink-0 bg-white border-b border-gray-100">
         <div className="flex items-center justify-between mb-6">
           <button 
             onClick={goToPrevMonth} 
-            className="w-10 h-10 rounded-full bg-gray-50 flex items-center justify-center text-gray-500 hover:bg-gray-100 transition-colors active:scale-95"
+            className="clay-card w-10 h-10 rounded-full flex items-center justify-center text-gray-500 transition-colors active:scale-95"
           >
             <ChevronLeft size={20} />
           </button>
@@ -975,7 +1046,7 @@ function CalendarTab({ currentMonth, calendarDays, usersMap, onEventClick, onMee
           
           <button 
             onClick={goToNextMonth} 
-            className="w-10 h-10 rounded-full bg-gray-50 flex items-center justify-center text-gray-500 hover:bg-gray-100 transition-colors active:scale-95"
+            className="clay-card w-10 h-10 rounded-full flex items-center justify-center text-gray-500 transition-colors active:scale-95"
           >
             <ChevronRight size={20} />
           </button>
@@ -1002,10 +1073,10 @@ function CalendarTab({ currentMonth, calendarDays, usersMap, onEventClick, onMee
                 className={[
                   "flex-shrink-0 flex flex-col items-center justify-center min-w-[60px] h-[75px] rounded-[20px] transition-all active:scale-95 relative",
                   isSelected 
-                    ? "bg-[var(--brand-primary)] text-white shadow-lg shadow-red-200" 
+                    ? "clay-card-brand text-white" 
                     : isToday
-                      ? "bg-[var(--brand-light)] text-[var(--brand-primary)] border-2 border-[var(--brand-primary)]/20"
-                      : "bg-gray-50 text-gray-600 hover:bg-gray-100",
+                      ? "clay-card bg-[var(--brand-light)] text-[var(--brand-primary)]"
+                      : "clay-card bg-gray-50 text-gray-600",
                   loadingMeta ? "opacity-50" : ""
                 ].join(" ")}
               >
@@ -1054,7 +1125,7 @@ function CalendarTab({ currentMonth, calendarDays, usersMap, onEventClick, onMee
             { label: "Visits", value: monthlyStats.visits, color: "#A0611A", bg: "#FDF4E7" },
             { label: "Rate", value: `${presentRate}%`, color: "#185FA5", bg: "#E6F1FB" }
           ].map((s) => (
-            <div key={s.label} className="flex-1 bg-gray-50 rounded-2xl p-3 text-center">
+            <div key={s.label} className="clay-card flex-1 p-3 text-center">
               <p className="text-[18px] font-bold leading-tight" style={{ color: s.color }}>{s.value}</p>
               <p className="text-[10px] font-medium text-gray-400 uppercase tracking-wider mt-0.5">{s.label}</p>
             </div>
@@ -1063,7 +1134,7 @@ function CalendarTab({ currentMonth, calendarDays, usersMap, onEventClick, onMee
       </div>
 
       {/* Activities Section */}
-      <div className="flex-1 overflow-y-auto px-5 pt-4 pb-24">
+      <div className="flex-1 overflow-y-auto px-5 pt-4 pb-36">
         {/* Date Header */}
         <div className="flex items-center justify-between mb-4">
           <div>
@@ -1083,7 +1154,7 @@ function CalendarTab({ currentMonth, calendarDays, usersMap, onEventClick, onMee
             )}
             <button 
               onClick={onCreateMeeting}
-              className="w-9 h-9 rounded-full bg-[var(--brand-primary)] flex items-center justify-center text-white hover:bg-[var(--brand-primary-hover)] transition-colors active:scale-95 shadow-md shadow-red-200"
+              className="clay-btn w-9 h-9 rounded-full bg-[var(--brand-primary)] flex items-center justify-center text-white active:scale-95"
             >
               <Plus size={18} />
             </button>
@@ -1099,8 +1170,8 @@ function CalendarTab({ currentMonth, calendarDays, usersMap, onEventClick, onMee
               className={[
                 "flex-shrink-0 px-4 py-2 rounded-full text-[12px] font-semibold transition-all active:scale-95",
                 activeFilter === filter
-                  ? "bg-gray-900 text-white"
-                  : "bg-gray-100 text-gray-600 hover:bg-gray-200"
+                  ? "clay-btn bg-gray-900 text-white"
+                  : "clay-card bg-gray-100 text-gray-600"
               ].join(" ")}
             >
               {filter}
@@ -1111,21 +1182,19 @@ function CalendarTab({ currentMonth, calendarDays, usersMap, onEventClick, onMee
         {/* Activity Cards */}
         <div className="flex flex-col gap-3">
           {loadingDate ? (
-            <div className="bg-white rounded-3xl border border-gray-100 px-4 py-10 text-center flex flex-col items-center gap-3">
+            <div className="clay-card px-4 py-10 text-center flex flex-col items-center gap-3">
               <div className="w-12 h-12 rounded-2xl bg-gray-50 flex items-center justify-center text-gray-300 animate-pulse">
                 <CalendarCheck size={24} />
               </div>
               <p className="text-[13px] text-gray-400">Loading activities...</p>
             </div>
           ) : filteredItems.length === 0 ? (
-            <div className="bg-white rounded-3xl border border-gray-100 px-4 py-10 text-center flex flex-col items-center gap-3">
-              <div className="w-12 h-12 rounded-2xl bg-gray-50 flex items-center justify-center text-gray-300">
-                <CalendarCheck size={24} />
-              </div>
+            <div className="clay-card px-4 py-10 text-center flex flex-col items-center gap-3">
+              <img src="/3d/no-activity.png" alt="No activity" className="w-28 h-28 object-contain" />
               <p className="text-[13px] text-gray-400">No activity recorded for this date.</p>
               <button 
                 onClick={onCreateMeeting}
-                className="mt-2 px-4 py-2 bg-[var(--brand-primary)] text-white rounded-full text-[12px] font-semibold hover:bg-[var(--brand-primary-hover)] transition-colors"
+                className="clay-btn mt-2 px-4 py-2 rounded-full bg-[var(--brand-primary)] text-white text-[12px] font-semibold"
               >
                 Schedule Activity
               </button>
@@ -1143,7 +1212,7 @@ function CalendarTab({ currentMonth, calendarDays, usersMap, onEventClick, onMee
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ delay: index * 0.05 }}
                     onClick={() => onMeetingClick(meeting)}
-                    className="w-full bg-[#6366F1] rounded-[24px] p-5 text-left text-white active:scale-[0.98] transition-all shadow-lg shadow-indigo-200"
+                    className="clay-card-indigo w-full p-5 text-left text-white active:scale-[0.98] transition-all"
                   >
                     <div className="flex items-start justify-between mb-3">
                       <div className="flex-1 min-w-0">
@@ -1195,12 +1264,12 @@ function CalendarTab({ currentMonth, calendarDays, usersMap, onEventClick, onMee
                     transition={{ delay: index * 0.05 }}
                     onClick={() => onEventClick(log)}
                     className={[
-                      "w-full rounded-[24px] p-5 text-left active:scale-[0.98] transition-all shadow-sm",
+                      "w-full p-5 text-left active:scale-[0.98] transition-all",
                       isLogin 
-                        ? "bg-[#1A7A4A] text-white shadow-lg shadow-green-200" 
+                        ? "clay-card-green text-white" 
                         : isClientVisit
-                          ? "bg-[#A0611A] text-white shadow-lg shadow-amber-200"
-                          : "bg-white border border-gray-100 text-gray-900"
+                          ? "clay-card-amber text-white"
+                          : "clay-card text-gray-900"
                     ].join(" ")}
                   >
                     <div className="flex items-start justify-between mb-3">
@@ -1263,16 +1332,16 @@ function CalendarTab({ currentMonth, calendarDays, usersMap, onEventClick, onMee
                     </div>
                     
                     <div className={[
-                      "flex items-center gap-4 text-[12px]",
+                      "flex flex-col gap-1.5 text-[11px] mt-1",
                       isLogin || isClientVisit ? "text-white/80" : "text-gray-500"
                     ].join(" ")}>
                       <div className="flex items-center gap-1.5">
-                        <Clock size={14} />
-date_created: new Date(log.date_created).toLocaleString("en-PH"),
+                        <Clock size={13} className="flex-shrink-0" />
+                        <span>{new Date(log.date_created).toLocaleTimeString("en-PH", { hour: "2-digit", minute: "2-digit", hour12: true })}</span>
                       </div>
-                      <div className="flex items-center gap-1.5">
-                        <MapPin size={14} />
-                        <LocationDisplay location={log.Location} latitude={log.Latitude} longitude={log.Longitude} isDark={isLogin || isClientVisit} />
+                      <div className="flex items-start gap-1.5 min-w-0">
+                        <MapPin size={13} className="flex-shrink-0 mt-0.5" />
+                        <LocationDisplay location={log.Location} latitude={log.Latitude} longitude={log.Longitude} isDark={isLogin || isClientVisit} className="min-w-0 break-words leading-snug" />
                       </div>
                     </div>
                     
@@ -1493,11 +1562,11 @@ function ReportsTab({ monthlyStats, allLogs, userId, userDetails }: {
 
   return (
     <div className="flex flex-col h-full">
-      <div className="px-5 pt-12 pb-6 flex-shrink-0" style={{ background: "linear-gradient(145deg,var(--brand-primary) 0%,var(--brand-primary-hover) 100%)" }}>
+      <div className="clay-card-brand rounded-none px-5 pt-12 pb-6 flex-shrink-0">
         <p className="text-white/65 text-[12px] mb-1">Monthly Overview</p>
         <h2 className="text-white text-[20px] font-semibold">Attendance Reports</h2>
       </div>
-      <div className="flex-1 overflow-y-auto px-4 pt-5 pb-28">
+      <div className="flex-1 overflow-y-auto px-4 pt-5 pb-36">
         <div className="grid grid-cols-2 gap-3 mb-5">
           {[
             { label: "Present Days", value: monthlyStats.present, icon: <CalendarCheck size={16} />, color: "#1A7A4A", bg: "#EEF7F2" },
@@ -1505,15 +1574,15 @@ function ReportsTab({ monthlyStats, allLogs, userId, userDetails }: {
             { label: "Site Visits", value: monthlyStats.visits, icon: <Building2 size={16} />, color: "#A0611A", bg: "#FDF4E7" },
             { label: "Attendance Rate", value: `${presentRate}%`, icon: <TrendingUp size={16} />, color: "#185FA5", bg: "#E6F1FB" },
           ].map((s) => (
-            <div key={s.label} className="bg-white rounded-2xl border border-gray-100 p-4">
-              <div className="w-8 h-8 rounded-[10px] flex items-center justify-center mb-3" style={{ background: s.bg, color: s.color }}>{s.icon}</div>
+            <div key={s.label} className="clay-card p-4">
+              <div className="clay-icon w-8 h-8 rounded-[10px] flex items-center justify-center mb-3" style={{ background: s.bg, color: s.color }}>{s.icon}</div>
               <p className="text-[22px] font-semibold text-gray-900">{s.value}</p>
               <p className="text-[11px] text-gray-400 mt-0.5">{s.label}</p>
             </div>
           ))}
         </div>
         <p className="text-[10px] font-semibold text-gray-400 uppercase tracking-widest mb-3">Activity Breakdown</p>
-        <div className="bg-white rounded-2xl border border-gray-100 overflow-hidden mb-5">
+        <div className="clay-card overflow-hidden mb-5">
           {[
             { label: "Login Records", value: loginCount, color: "#1A7A4A" },
             { label: "Logout Records", value: logoutCount, color: "var(--brand-primary)" },
@@ -1534,9 +1603,9 @@ function ReportsTab({ monthlyStats, allLogs, userId, userDetails }: {
         {/* GPS Report Card */}
         <button
           onClick={() => router.push(`/gps-report?id=${encodeURIComponent(userId || "")}`)}
-          className="w-full flex items-center gap-4 bg-white rounded-2xl border border-gray-100 px-4 py-4 text-left hover:border-[var(--brand-primary)]/30 hover:bg-[var(--brand-light)] active:scale-[0.98] transition-all group shadow-sm mt-3"
+          className="w-full flex items-center gap-4 clay-card px-4 py-4 text-left active:scale-[0.98] transition-all group mt-3"
         >
-          <div className="w-11 h-11 rounded-[14px] bg-[#FDF4E7] flex items-center justify-center flex-shrink-0 group-hover:bg-[#A0611A] transition-colors">
+          <div className="clay-icon w-11 h-11 rounded-[14px] bg-[#FDF4E7] flex items-center justify-center flex-shrink-0 group-hover:bg-[#A0611A] transition-colors">
             <MapPin size={20} className="text-[#A0611A] group-hover:text-white transition-colors" />
           </div>
           <div className="flex-1 min-w-0">
@@ -1552,9 +1621,9 @@ function ReportsTab({ monthlyStats, allLogs, userId, userDetails }: {
         <OfflineActivitiesCard />
 
         {/* Export Data Section */}
-        <div className="mt-5 bg-white rounded-2xl border border-gray-100 p-5 shadow-sm">
+        <div className="clay-card mt-5 p-5">
           <div className="flex items-center gap-3 mb-4">
-            <div className="w-10 h-10 rounded-xl bg-[var(--brand-light)] flex items-center justify-center flex-shrink-0">
+            <div className="clay-icon w-10 h-10 rounded-xl bg-[var(--brand-light)] flex items-center justify-center flex-shrink-0">
               <FileDown size={20} className="text-[var(--brand-primary)]" />
             </div>
             <div>
@@ -1672,7 +1741,7 @@ function ReportsTab({ monthlyStats, allLogs, userId, userDetails }: {
             <button
               onClick={exportToExcel}
               disabled={loading}
-              className="flex-1 flex items-center justify-center gap-2 bg-[var(--brand-primary)] rounded-xl px-4 py-3 text-[13px] font-bold text-white hover:bg-[var(--brand-primary-hover)] active:scale-[0.98] transition-all disabled:opacity-50"
+              className="clay-btn flex-1 flex items-center justify-center gap-2 rounded-xl bg-[var(--brand-primary)] px-4 py-3 text-[13px] font-bold text-white active:scale-[0.98] transition-all disabled:opacity-50"
             >
               {loading ? <Loader2 size={16} className="animate-spin" /> : <FileDown size={16} />}
               Export
@@ -1775,9 +1844,9 @@ function OfflineActivitiesCard() {
       {/* Card Button */}
       <button
         onClick={() => setShowDialog(true)}
-        className="w-full flex items-center gap-4 bg-white rounded-2xl border border-gray-100 px-4 py-4 text-left hover:border-[var(--brand-primary)]/30 hover:bg-[var(--brand-light)] active:scale-[0.98] transition-all group shadow-sm mt-3 relative"
-      >
-        <div className="w-11 h-11 rounded-[14px] bg-[#E6F1FB] flex items-center justify-center flex-shrink-0 group-hover:bg-[#185FA5] transition-colors relative">
+        className="w-full flex items-center gap-4 clay-card px-4 py-4 text-left active:scale-[0.98] transition-all group mt-3 relative"
+        >
+        <div className="clay-icon w-11 h-11 rounded-[14px] bg-[#E6F1FB] flex items-center justify-center flex-shrink-0 group-hover:bg-[#185FA5] transition-colors relative">
           <Cloud size={20} className="text-[#185FA5] group-hover:text-white transition-colors" />
           {count > 0 && (
             <span className="absolute -top-1.5 -right-1.5 w-5 h-5 bg-[var(--brand-primary)] text-white text-[10px] font-bold rounded-full flex items-center justify-center border-2 border-white">
@@ -1802,7 +1871,7 @@ function OfflineActivitiesCard() {
           <VisuallyHidden>
             <DialogTitle>Offline Activities</DialogTitle>
           </VisuallyHidden>
-          <div className="bg-[var(--brand-primary)] px-6 pt-5 pb-6 flex-shrink-0">
+          <div className="clay-card-brand rounded-none px-6 pt-5 pb-6 flex-shrink-0">
             <div className="flex items-center gap-3 mb-2">
               <button
                 onClick={() => setShowDialog(false)}
@@ -1831,7 +1900,7 @@ function OfflineActivitiesCard() {
                   const isSyncing = syncingId === log.id;
                   
                   return (
-                    <div key={log.id} className="bg-white rounded-2xl border border-gray-100 p-4">
+                    <div key={log.id} className="clay-card p-4">
                       <div className="flex items-start gap-3 mb-3">
                         <div className={`w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0 ${
                           payload.Status === "Login" ? "bg-[#EEF7F2]" : "bg-[var(--brand-light)]"
@@ -1875,7 +1944,7 @@ function OfflineActivitiesCard() {
                           isSyncing
                             ? "bg-gray-100 text-gray-400 cursor-not-allowed"
                             : navigator.onLine
-                              ? "bg-[var(--brand-primary)] text-white hover:bg-[var(--brand-primary-hover)] active:scale-[0.98]"
+                              ? "clay-btn bg-[var(--brand-primary)] text-white active:scale-[0.98]"
                               : "bg-gray-200 text-gray-400 cursor-not-allowed"
                         ].join(" ")}
                       >
@@ -1956,23 +2025,22 @@ function AdminTab({ userId }: { userId: string | null | undefined }) {
   return (
     <div className="flex flex-col h-full">
       <div
-        className="px-5 pt-12 pb-10 flex-shrink-0"
-        style={{ background: "linear-gradient(145deg,var(--brand-primary) 0%,var(--brand-primary-hover) 100%)" }}
+        className="clay-card-brand rounded-none px-5 pt-12 pb-10 flex-shrink-0"
       >
         <p className="text-white/65 text-[12px] mb-1">Administrator Panel</p>
         <h2 className="text-white text-[20px] font-semibold">System Control</h2>
       </div>
 
-      <div className="flex-1 overflow-y-auto px-4 pt-6 pb-32">
+      <div className="flex-1 overflow-y-auto px-4 pt-6 pb-40">
         <p className="text-[10px] font-semibold text-gray-400 uppercase tracking-widest mb-4">Admin Tools</p>
         <div className="grid grid-cols-1 gap-3">
           {adminTools.map((tool) => (
             <button
               key={tool.title}
               onClick={() => router.push(tool.href)}
-              className="w-full flex items-center gap-4 bg-white rounded-2xl border border-gray-100 p-4 text-left hover:border-[var(--brand-primary)]/30 hover:bg-[var(--brand-light)] active:scale-[0.98] transition-all group shadow-sm"
+              className="w-full flex items-center gap-4 clay-card p-4 text-left active:scale-[0.98] transition-all group"
             >
-              <div className={`w-11 h-11 rounded-[14px] ${tool.color} flex items-center justify-center flex-shrink-0 group-hover:scale-110 transition-transform`}>
+              <div className={`clay-icon w-11 h-11 rounded-[14px] ${tool.color} flex items-center justify-center flex-shrink-0 group-hover:scale-110 transition-transform`}>
                 {tool.icon}
               </div>
               <div className="flex-1 min-w-0">
@@ -2246,8 +2314,7 @@ function ProfileTab({
     <div className="flex flex-col h-full overflow-hidden">
       {/* Header */}
       <div
-        className="px-5 pt-12 pb-10 flex-shrink-0 flex flex-col items-center"
-        style={{ background: "linear-gradient(145deg,var(--brand-primary) 0%,var(--brand-primary-hover) 100%)" }}
+        className="clay-card-brand rounded-none px-5 pt-12 pb-10 flex-shrink-0 flex flex-col items-center"
       >
         {userDetails?.profilePicture ? (
           <img src={userDetails.profilePicture} alt="" className="w-20 h-20 rounded-full border-4 border-white/30 object-cover mb-3" />
@@ -2262,9 +2329,9 @@ function ProfileTab({
         <p className="text-white/65 text-[12px] mt-1">{userDetails?.Role ?? "—"}</p>
       </div>
 
-      <div className="flex-1 overflow-y-auto px-4 pt-5 pb-32">
+      <div className="flex-1 overflow-y-auto px-4 pt-5 pb-40">
         {/* User info */}
-        <div className="bg-white rounded-2xl border border-gray-100 overflow-hidden mb-5">
+        <div className="clay-card overflow-hidden mb-5">
           {fields.map((f, i) => (
             <div key={f.label} className={`flex items-center justify-between px-4 py-3.5 ${i < fields.length - 1 ? "border-b border-gray-50" : ""}`}>
               <span className="text-[12px] font-semibold text-gray-400">{f.label}</span>
@@ -2277,7 +2344,7 @@ function ProfileTab({
         <p className="text-[10px] font-semibold text-gray-400 uppercase tracking-widest mb-3">Settings & Security</p>
         <div className="flex flex-col gap-3 mb-5">
           {/* Secondary Email Notification */}
-          <div className="bg-white rounded-2xl border border-gray-100 p-4 shadow-sm flex flex-col gap-3">
+          <div className="clay-card p-4 flex flex-col gap-3">
             <div className="flex items-center gap-4">
               <div className="w-11 h-11 rounded-[14px] bg-[var(--brand-light)] flex items-center justify-center flex-shrink-0">
                 <Globe size={20} className="text-[var(--brand-primary)]" />
@@ -2308,7 +2375,7 @@ function ProfileTab({
 
 
           {/* 2FA Setup Section */}
-          <div className="w-full flex flex-col gap-3 bg-white rounded-2xl border border-gray-100 px-4 py-4 text-left shadow-sm">
+          <div className="w-full flex flex-col gap-3 clay-card px-4 py-4 text-left">
             <div className="flex items-center gap-4">
               <div className="w-11 h-11 rounded-[14px] bg-[#EEF7F2] flex items-center justify-center flex-shrink-0">
                 <ShieldCheck size={20} className="text-[#1A7A4A]" />
@@ -2353,7 +2420,7 @@ function ProfileTab({
           </div>
 
           {/* Face Verification Toggle */}
-          <div className="w-full flex items-center gap-4 bg-white rounded-2xl border border-gray-100 px-4 py-4 text-left shadow-sm">
+          <div className="w-full flex items-center gap-4 clay-card px-4 py-4 text-left">
             <div className="w-11 h-11 rounded-[14px] bg-[var(--brand-light)] flex items-center justify-center flex-shrink-0">
               <User size={20} className="text-[var(--brand-primary)]" />
             </div>
@@ -2399,9 +2466,9 @@ function ProfileTab({
 
           <button
             onClick={onFaceRegister}
-            className="w-full flex items-center gap-4 bg-white rounded-2xl border border-gray-100 px-4 py-4 text-left hover:border-[var(--brand-primary)]/30 hover:bg-[var(--brand-light)] active:scale-[0.98] transition-all group shadow-sm"
+            className="w-full flex items-center gap-4 clay-card px-4 py-4 text-left active:scale-[0.98] transition-all group"
           >
-            <div className="w-11 h-11 rounded-[14px] bg-[var(--brand-light)] flex items-center justify-center flex-shrink-0 group-hover:bg-[var(--brand-primary)] transition-colors">
+            <div className="clay-icon w-11 h-11 rounded-[14px] bg-[var(--brand-light)] flex items-center justify-center flex-shrink-0 group-hover:bg-[var(--brand-primary)] transition-colors">
               <User size={20} className="text-[var(--brand-primary)] group-hover:text-white transition-colors" />
             </div>
             <div className="flex-1 min-w-0">
@@ -2415,9 +2482,9 @@ function ProfileTab({
 
           <button
             onClick={onBiometricRegister}
-            className="w-full flex items-center gap-4 bg-white rounded-2xl border border-gray-100 px-4 py-4 text-left hover:border-[#CC1318]/30 hover:bg-[#FFF8F8] active:scale-[0.98] transition-all group shadow-sm"
+            className="w-full flex items-center gap-4 clay-card px-4 py-4 text-left active:scale-[0.98] transition-all group"
           >
-            <div className="w-11 h-11 rounded-[14px] bg-[#E6F1FB] flex items-center justify-center flex-shrink-0 group-hover:bg-[#185FA5] transition-colors">
+            <div className="clay-icon w-11 h-11 rounded-[14px] bg-[#E6F1FB] flex items-center justify-center flex-shrink-0 group-hover:bg-[#185FA5] transition-colors">
               <Fingerprint size={20} className="text-[#185FA5] group-hover:text-white transition-colors" />
             </div>
             <div className="flex-1 min-w-0">
@@ -2437,7 +2504,7 @@ function ProfileTab({
               onClick={() => setShowIOSGuide(false)}
             >
               <div
-                className="w-full max-w-sm bg-white rounded-t-[32px] p-6 pb-10 shadow-2xl"
+                className="clay-card w-full max-w-sm rounded-t-[32px] p-6 pb-10"
                 onClick={e => e.stopPropagation()}
               >
                 <div className="w-10 h-1 rounded-full bg-gray-200 mx-auto mb-5" />
@@ -2456,7 +2523,7 @@ function ProfileTab({
                     { step: "2", icon: "➕", text: 'Scroll down and tap "Add to Home Screen"' },
                     { step: "3", icon: "✅", text: 'Tap "Add" in the top-right corner — the app icon will appear on your home screen' },
                   ].map(({ step, icon, text }) => (
-                    <div key={step} className="flex items-start gap-3 bg-gray-50 rounded-2xl p-3.5 border border-gray-100">
+                    <div key={step} className="clay-card flex items-start gap-3 p-3.5">
                       <div className="w-7 h-7 rounded-full bg-purple-600 flex items-center justify-center flex-shrink-0 text-white text-[11px] font-bold">
                         {step}
                       </div>
@@ -2487,7 +2554,7 @@ function ProfileTab({
               onClick={cancelTwoFactorSetup}
             >
               <div
-                className="w-full max-w-sm bg-white rounded-t-[32px] p-6 pb-10 shadow-2xl overflow-y-auto max-h-[90vh]"
+                className="clay-card w-full max-w-sm rounded-t-[32px] p-6 pb-10 overflow-y-auto max-h-[90vh]"
                 onClick={e => e.stopPropagation()}
               >
                 <div className="w-10 h-1 rounded-full bg-gray-200 mx-auto mb-5" />
@@ -2622,7 +2689,7 @@ function ProfileTab({
             sessions.map((session, index) => {
               const isCurrent = session.token === document.cookie.split('; ').find(row => row.startsWith('session='))?.split('=')[1];
               return (
-                <div key={session._id || session.token || index} className="w-full flex items-center gap-4 bg-white rounded-2xl border border-gray-100 px-4 py-4 shadow-sm">
+                <div key={session._id || session.token || index} className="w-full flex items-center gap-4 clay-card px-4 py-4">
                   <div className={`w-11 h-11 rounded-[14px] flex items-center justify-center flex-shrink-0 ${isCurrent ? 'bg-[#EEF7F2]' : 'bg-gray-50'}`}>
                     {session.os?.toLowerCase().includes("win") || session.os?.toLowerCase().includes("mac") ? (
                       <Laptop size={20} className={isCurrent ? 'text-[#1A7A4A]' : 'text-gray-400'} />
@@ -2662,7 +2729,7 @@ function ProfileTab({
           <p className="text-[10px] font-semibold text-gray-400 uppercase tracking-widest mb-3">Account</p>
           <button
             onClick={onLogout}
-            className="w-full flex items-center gap-4 bg-white rounded-2xl border border-gray-100 px-4 py-4 text-left hover:border-red-200 hover:bg-[var(--brand-light)] active:scale-[0.98] transition-all group"
+            className="w-full flex items-center gap-4 clay-card px-4 py-4 text-left active:scale-[0.98] transition-all group"
           >
             <div className="w-11 h-11 rounded-[14px] bg-[var(--brand-light)] flex items-center justify-center flex-shrink-0 group-hover:bg-[var(--brand-primary)] transition-colors">
               <Power size={18} className="text-[var(--brand-primary)] group-hover:text-white transition-colors" />
@@ -2695,7 +2762,7 @@ function CustomizePanel() {
   ];
 
   return (
-    <div className="bg-white rounded-2xl border border-gray-100 overflow-hidden shadow-sm mb-5">
+    <div className="clay-card overflow-hidden mb-5">
       {items.map((it, i) => (
         <div
           key={String(it.key)}
@@ -2737,7 +2804,7 @@ function CameraTimerPanel() {
   const PRESETS = [3, 5, 10, 15, 30];
 
   return (
-    <div className="bg-white rounded-2xl border border-gray-100 overflow-hidden shadow-sm mb-5">
+    <div className="clay-card overflow-hidden mb-5">
       {/* Enable / disable toggle */}
       <div className="flex items-center gap-4 px-4 py-3.5 border-b border-gray-50">
         <div className="w-10 h-10 rounded-[12px] bg-gray-50 flex items-center justify-center flex-shrink-0 text-[18px]">
@@ -2826,7 +2893,7 @@ function InstallAppSection({
 
   if (isInstalled) {
     return (
-      <div className="bg-white rounded-2xl border border-green-100 overflow-hidden mb-5 shadow-sm">
+      <div className="clay-card overflow-hidden mb-5">
         <div className="flex items-center gap-4 px-4 py-4 bg-gradient-to-r from-green-50 to-emerald-50">
           <div className="w-11 h-11 rounded-[14px] bg-green-100 flex items-center justify-center flex-shrink-0">
             <Download size={20} className="text-green-600" />
@@ -2846,7 +2913,7 @@ function InstallAppSection({
   }
 
   return (
-    <div className="bg-white rounded-2xl border border-gray-100 overflow-hidden mb-5 shadow-sm">
+    <div className="clay-card overflow-hidden mb-5">
       {/* Tabs */}
       <div className="flex border-b border-gray-100">
         {(["android", "ios"] as const).map((p) => (
@@ -2880,7 +2947,7 @@ function InstallAppSection({
         </p>
         <div className="flex flex-col gap-2.5">
           {steps.map((s, i) => (
-            <div key={i} className="flex items-start gap-3 bg-gray-50 rounded-2xl p-3 border border-gray-100">
+            <div key={i} className="clay-card flex items-start gap-3 p-3">
               <div className="w-7 h-7 rounded-full bg-[var(--brand-primary)] flex items-center justify-center flex-shrink-0 text-white text-[11px] font-bold">
                 {i + 1}
               </div>
@@ -3364,7 +3431,7 @@ const today = phTodayAsLocalDate();
   const NAV: { id: ActiveTab; icon: any; label: string }[] = [
     { id: "home", icon: Home, label: "Home" },
     { id: "calendar", icon: CalendarCheck, label: "Calendar" },
-    { id: "reports", icon: BarChart3, label: "Reports" },
+    { id: "messaging", icon: MessageSquare, label: "Messages" },
     { id: "profile", icon: User, label: "Profile" },
   ];
 
@@ -3506,6 +3573,8 @@ const today = phTodayAsLocalDate();
           goToNextMonth={goToNextMonth} 
           userDetails={userDetails}
         />;
+      case "messaging":
+        return <MessagingPage />;
       case "reports":
         return <ReportsTab monthlyStats={monthlyStats} allLogs={allVisibleAccounts} userId={userId} userDetails={userDetails} />;
       case "profile":
@@ -3518,7 +3587,7 @@ const today = phTodayAsLocalDate();
   };
 
   return (
-    <div className="fixed inset-0 flex flex-col bg-[#F9F6F4] overflow-hidden">
+    <div className="fixed inset-0 flex flex-col clay-bg overflow-hidden">
       <OfflineBanner isOnline={isOnline} isSyncing={isSyncing} pendingCount={pendingCount} onSyncNow={syncNow} />
 
       {/* Skeleton loader — only shown on very first load before any data */}
@@ -3527,7 +3596,7 @@ const today = phTodayAsLocalDate();
           {/* Header skeleton */}
           <div className="h-44 bg-[var(--brand-primary)] opacity-90 flex-shrink-0" />
           {/* Card skeleton */}
-          <div className="mx-4 -mt-5 bg-white rounded-[22px] shadow-lg p-4 flex-shrink-0">
+          <div className="mx-4 -mt-5 clay-card p-4 flex-shrink-0">
             <div className="flex justify-between items-center mb-3">
               <div className="h-3 w-24 bg-gray-100 rounded-full animate-pulse" />
               <div className="h-5 w-16 bg-gray-100 rounded-full animate-pulse" />
@@ -3538,7 +3607,7 @@ const today = phTodayAsLocalDate();
           {/* Grid skeleton */}
           <div className="px-4 pt-6 grid grid-cols-2 gap-3">
             {[...Array(4)].map((_, i) => (
-              <div key={i} className="bg-white rounded-[18px] p-4 h-24 animate-pulse">
+              <div key={i} className="clay-card p-4 h-24 animate-pulse">
                 <div className="w-9 h-9 rounded-[10px] bg-gray-100 mb-3" />
                 <div className="h-3 w-20 bg-gray-100 rounded-full mb-1.5" />
                 <div className="h-2.5 w-16 bg-gray-100 rounded-full" />
@@ -3565,7 +3634,7 @@ const today = phTodayAsLocalDate();
       {activeTab === "home" && (
         <>
           {isPanelOpen ? (
-            <div className="absolute bottom-20 right-4 w-72 max-h-80 bg-white rounded-3xl border border-gray-100 shadow-2xl z-40 flex flex-col overflow-hidden">
+            <div className="clay-card absolute bottom-20 right-4 w-72 max-h-80 z-40 flex flex-col overflow-hidden">
               <div className="flex items-center justify-between px-4 py-3 border-b border-gray-100 flex-shrink-0">
                 <div>
                   <p className="font-semibold text-[13px] text-gray-800">Today's Activity</p>
@@ -3582,7 +3651,7 @@ const today = phTodayAsLocalDate();
               </div>
             </div>
           ) : (
-            <button onClick={() => setIsPanelOpen(true)} className="absolute bottom-20 right-4 z-40 w-11 h-11 rounded-2xl bg-[#CC1318] flex items-center justify-center shadow-lg shadow-red-200 hover:bg-[#A8100F] transition-all active:scale-95">
+            <button onClick={() => setIsPanelOpen(true)} className="clay-btn absolute bottom-20 right-4 z-40 w-11 h-11 rounded-2xl bg-[#CC1318] flex items-center justify-center transition-all active:scale-95">
               <MapPin size={18} className="text-white" />
               {todayVisits.length > 0 && (
                 <span className="absolute -top-1 -right-1 w-4 h-4 bg-white rounded-full border-2 border-[#CC1318] flex items-center justify-center text-[8px] font-bold text-[#CC1318]">{todayVisits.length}</span>
@@ -3592,97 +3661,71 @@ const today = phTodayAsLocalDate();
         </>
       )}
 
-      {/* Bottom Navigation — curved FAB cutout */}
+      {/* Bottom Navigation — floating pill */}
       <div
-        className="flex-shrink-0 relative"
-        style={{ paddingBottom: "env(safe-area-inset-bottom,0px)" }}
+        className="flex-shrink-0 px-4 pb-4 pt-2"
+        style={{ paddingBottom: "max(env(safe-area-inset-bottom,0px), 16px)" }}
       >
-        {/* SVG curve that creates the mountain notch */}
-        {activeTab === "home" ? (
-          <svg
-            className="absolute -top-[50px] left-0 w-full pointer-events-none"
-            height="60"
-            viewBox="0 0 390 28"
-            preserveAspectRatio="none"
-            xmlns="http://www.w3.org/2000/svg"
-          >
-            <path
-              d="M0 28 L140 28 Q165 28 172 14 Q180 0 195 0 Q210 0 218 14 Q225 28 250 28 L390 28 Z"
-              fill="white"
-            />
-            {/* Top border line following the curve */}
-            <path
-              d="M0 28 L140 28 Q165 28 172 14 Q180 0 195 0 Q210 0 218 14 Q225 28 250 28 L390 28"
-              fill="none"
-              stroke="#f3f4f6"
-              strokeWidth="1"
-            />
-          </svg>
-        ) : (
-          /* Flat top border when no FAB */
-          <div className="absolute -top-px left-0 right-0 h-px bg-gray-100" />
-        )}
-
-        <div className="bg-white flex items-center">
-          {NAV.map((item) => {
-            const isActive = activeTab === item.id;
-            const isMiddle = item.id === "home";
-            // Show notification badge on profile tab
-            const showBadge = item.id === "profile" && notifUnreadCount > 0;
-            return (
+        <div className="relative">
+          {/* FAB floats above the pill on Home tab */}
+          {activeTab === "home" && (
+            <div className="absolute -top-6 left-1/2 -translate-x-1/2 z-10">
               <button
-                key={item.id}
                 onClick={() => {
-                  setActiveTab(item.id);
-                  if (item.id === "profile") markNotifsRead();
-                  haptic("light");
+                  haptic("medium");
+                  if (userDetails?.Department === "Sales") {
+                    setCreateSalesAttendanceOpen(true);
+                  } else {
+                    setCreateAttendanceOpen(true);
+                  }
                 }}
-                className={[
-                  "flex-1 flex flex-col items-center gap-1 py-3 relative transition-all",
-                  isMiddle && activeTab === "home" ? "pt-5" : "",
-                ].join(" ")}
+                style={{ width: 50, height: 50 }}
+                className="clay-btn rounded-full bg-[#CC1318] flex items-center justify-center active:scale-95 transition-all border-[3px] border-white"
               >
-                <div className="relative">
-                  <item.icon
-                    size={20}
-                    className={isActive ? "text-[#CC1318]" : "text-gray-400"}
-                    strokeWidth={isActive ? 2.5 : 1.8}
-                  />
-                  {showBadge && (
-                    <span className="absolute -top-1 -right-1 w-4 h-4 bg-[#CC1318] rounded-full flex items-center justify-center text-[8px] font-bold text-white">
-                      {notifUnreadCount > 9 ? "9+" : notifUnreadCount}
-                    </span>
-                  )}
-                </div>
-                <span className={`text-[10px] font-semibold ${isActive ? "text-[#CC1318]" : "text-gray-400"}`}>
-                  {item.label}
-                </span>
-                {isActive && (
-                  <span className="absolute bottom-0 left-1/2 -translate-x-1/2 w-1 h-1 rounded-full bg-[#CC1318]" />
-                )}
+                <Plus size={20} className="text-white" />
               </button>
-            );
-          })}
-        </div>
+            </div>
+          )}
 
-        {/* Circular FAB — sits in the notch, above the nav */}
-        {activeTab === "home" && (
-          <div className="absolute -top-12 left-1/2 -translate-x-1/2 z-10">
-            <button
-              onClick={() => {
-                haptic("medium");
-                if (userDetails?.Department === "Sales") {
-                  setCreateSalesAttendanceOpen(true);
-                } else {
-                  setCreateAttendanceOpen(true);
-                }
-              }}
-              className="w-14 h-14 rounded-full bg-[#CC1318] flex items-center justify-center shadow-xl shadow-red-300 hover:bg-[#A8100F] active:scale-95 transition-all border-4 border-white"
-            >
-              <Plus size={22} className="text-white" />
-            </button>
+          {/* Pill nav bar */}
+          <div className="clay-nav flex items-center rounded-[28px] px-1 py-1.5">
+            {NAV.map((item) => {
+              const isActive = activeTab === item.id;
+              const showBadge = item.id === "profile" && notifUnreadCount > 0;
+              return (
+                <button
+                  key={item.id}
+                  onClick={() => {
+                    setActiveTab(item.id);
+                    if (item.id === "profile") markNotifsRead();
+                    haptic("light");
+                  }}
+                  className="flex-1 flex flex-col items-center gap-0.5 py-1.5 relative transition-all active:scale-95"
+                >
+                  {/* Active highlight behind icon */}
+                  {isActive && (
+                    <span className="absolute top-0.5 left-1/2 -translate-x-1/2 w-11 h-8 rounded-[18px] bg-[var(--brand-light)]" />
+                  )}
+                  <div className="relative z-10">
+                    <item.icon
+                      size={19}
+                      className={isActive ? "text-[var(--brand-primary)]" : "text-gray-400"}
+                      strokeWidth={isActive ? 2.5 : 1.8}
+                    />
+                    {showBadge && (
+                      <span className="absolute -top-1 -right-1 w-3.5 h-3.5 bg-[var(--brand-primary)] rounded-full flex items-center justify-center text-[7px] font-bold text-white">
+                        {notifUnreadCount > 9 ? "9+" : notifUnreadCount}
+                      </span>
+                    )}
+                  </div>
+                  <span className={`text-[9px] font-bold z-10 transition-colors ${isActive ? "text-[var(--brand-primary)]" : "text-gray-400"}`}>
+                    {item.label}
+                  </span>
+                </button>
+              );
+            })}
           </div>
-        )}
+        </div>
       </div>
 
       {/* ── Swipe-to-refresh indicator ── */}
@@ -3741,7 +3784,7 @@ const today = phTodayAsLocalDate();
           <VisuallyHidden>
             <DialogTitle>Face Registration</DialogTitle>
           </VisuallyHidden>
-          <div className="bg-[var(--brand-primary)] px-6 pt-5 pb-6 flex-shrink-0">
+          <div className="clay-card-brand rounded-none px-6 pt-5 pb-6 flex-shrink-0">
             <div className="flex items-center gap-3 mb-2">
               <button
                 onClick={() => setFaceRegisterOpen(false)}
@@ -3793,7 +3836,7 @@ function MeetingDetailsDialog({ open, onOpenChange, meeting, usersMap }: {
         <VisuallyHidden>
           <DialogTitle>Meeting Details</DialogTitle>
         </VisuallyHidden>
-        <div className="bg-purple-600 px-6 pt-8 pb-10 relative overflow-hidden">
+        <div className="clay-card-indigo rounded-none px-6 pt-8 pb-10 relative overflow-hidden">
           <div className="absolute top-0 right-0 p-4">
             <button
                 onClick={() => onOpenChange(false)}
@@ -3816,7 +3859,7 @@ function MeetingDetailsDialog({ open, onOpenChange, meeting, usersMap }: {
         <div className="bg-white px-6 py-6 -mt-6 rounded-t-[32px] relative z-20">
           <div className="flex flex-col gap-5">
             <div className="flex items-center gap-4">
-              <div className="w-10 h-10 rounded-xl bg-purple-50 flex items-center justify-center flex-shrink-0"><User size={18} className="text-purple-600" /></div>
+              <div className="clay-icon w-10 h-10 rounded-xl bg-purple-50 flex items-center justify-center flex-shrink-0"><User size={18} className="text-purple-600" /></div>
               <div>
                 <p className="text-[11px] text-gray-400 font-bold uppercase tracking-widest">Organizer / Manager</p>
                 <p className="text-[14px] font-semibold text-gray-800">
@@ -3827,7 +3870,7 @@ function MeetingDetailsDialog({ open, onOpenChange, meeting, usersMap }: {
             </div>
             {meeting.CompanyName && (
               <div className="flex items-center gap-4">
-                <div className="w-10 h-10 rounded-xl bg-purple-50 flex items-center justify-center flex-shrink-0"><Building2 size={18} className="text-purple-600" /></div>
+                <div className="clay-icon w-10 h-10 rounded-xl bg-purple-50 flex items-center justify-center flex-shrink-0"><Building2 size={18} className="text-purple-600" /></div>
                 <div>
                   <p className="text-[11px] text-gray-400 font-bold uppercase tracking-widest">Company</p>
                   <p className="text-[14px] font-semibold text-gray-800">{meeting.CompanyName}</p>
@@ -3835,7 +3878,7 @@ function MeetingDetailsDialog({ open, onOpenChange, meeting, usersMap }: {
               </div>
             )}
             <div className="flex items-center gap-4">
-              <div className="w-10 h-10 rounded-xl bg-purple-50 flex items-center justify-center flex-shrink-0"><CalendarIcon size={18} className="text-purple-600" /></div>
+              <div className="clay-icon w-10 h-10 rounded-xl bg-purple-50 flex items-center justify-center flex-shrink-0"><CalendarIcon size={18} className="text-purple-600" /></div>
               <div>
                 <p className="text-[11px] text-gray-400 font-bold uppercase tracking-widest">Schedule</p>
                 <p className="text-[14px] font-semibold text-gray-800">
@@ -3847,14 +3890,14 @@ function MeetingDetailsDialog({ open, onOpenChange, meeting, usersMap }: {
               </div>
             </div>
             <div className="flex items-center gap-4">
-              <div className="w-10 h-10 rounded-xl bg-purple-50 flex items-center justify-center flex-shrink-0"><Clock size={18} className="text-purple-600" /></div>
+              <div className="clay-icon w-10 h-10 rounded-xl bg-purple-50 flex items-center justify-center flex-shrink-0"><Clock size={18} className="text-purple-600" /></div>
               <div>
                 <p className="text-[11px] text-gray-400 font-bold uppercase tracking-widest">Duration</p>
                 <p className="text-[14px] font-semibold text-gray-800">{meeting.Duration} minutes</p>
               </div>
             </div>
             <div className="flex items-center gap-4">
-              <div className="w-10 h-10 rounded-xl bg-purple-50 flex items-center justify-center flex-shrink-0"><MapPin size={18} className="text-purple-600" /></div>
+              <div className="clay-icon w-10 h-10 rounded-xl bg-purple-50 flex items-center justify-center flex-shrink-0"><MapPin size={18} className="text-purple-600" /></div>
               <div className="flex-1 min-w-0">
                 <p className="text-[11px] text-gray-400 font-bold uppercase tracking-widest">
                   Location
@@ -3886,7 +3929,7 @@ function MeetingDetailsDialog({ open, onOpenChange, meeting, usersMap }: {
               </div>
             </div>
           </div>
-          <button onClick={() => onOpenChange(false)} className="w-full mt-8 py-4 bg-purple-600 text-white rounded-2xl font-bold text-[14px] shadow-lg shadow-purple-100 active:scale-95 transition-all">Close Details</button>
+          <button onClick={() => onOpenChange(false)} className="clay-btn w-full mt-8 py-4 rounded-2xl bg-purple-600 text-white font-bold text-[14px] active:scale-95 transition-all">Close Details</button>
         </div>
       </DialogContent>
     </Dialog>
@@ -3972,7 +4015,7 @@ function CreateMeetingDialog({ open, onOpenChange, userDetails, onSuccess }: {
         <VisuallyHidden>
           <DialogTitle>Create Meetings</DialogTitle>
         </VisuallyHidden>
-        <div className="bg-purple-600 px-6 pt-5 pb-6">
+        <div className="clay-card-indigo rounded-none px-6 pt-5 pb-6">
           <div className="flex items-center gap-3 mb-2">
             <button onClick={() => onOpenChange(false)} className="w-8 h-8 rounded-full bg-white/20 flex items-center justify-center text-white hover:bg-white/30 transition-colors"><X size={15} /></button>
             <div className="flex-1">
@@ -4017,7 +4060,7 @@ function CreateMeetingDialog({ open, onOpenChange, userDetails, onSuccess }: {
           </div>
 
           {duration > 0 && (
-            <div className="bg-purple-50 rounded-xl px-4 py-2 flex items-center justify-between border border-purple-100">
+            <div className="clay-pill rounded-xl px-4 py-2 flex items-center justify-between">
               <span className="text-[11px] font-bold text-purple-600 uppercase tracking-wider">Auto Duration</span>
               <span className="text-[13px] font-bold text-purple-700">{duration} minutes</span>
             </div>
@@ -4071,7 +4114,7 @@ function CreateMeetingDialog({ open, onOpenChange, userDetails, onSuccess }: {
           <button 
             type="submit"
             disabled={loading}
-            className="w-full mt-2 py-4 bg-purple-600 text-white rounded-2xl font-bold text-[14px] shadow-lg shadow-purple-100 active:scale-95 transition-all disabled:opacity-50"
+            className="clay-btn w-full mt-2 py-4 rounded-2xl bg-purple-600 text-white font-bold text-[14px] active:scale-95 transition-all disabled:opacity-50"
           >
             {loading ? "Creating..." : "Schedule Meeting"}
           </button>

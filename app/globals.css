@@ -241,3 +241,158 @@
 .leaflet-pane {
   z-index: 0 !important;
 }
+
+/* ─────────────────────────────────────────────────────────────────
+   CLAYMORPHISM DESIGN SYSTEM
+   ───────────────────────────────────────────────────────────────── */
+
+/* Clay card — soft 3-D pillowy surface */
+.clay-card {
+  background: #ffffff;
+  border-radius: 24px;
+  box-shadow:
+    0 8px 20px rgba(0, 0, 0, 0.06),
+    0 2px 6px  rgba(0, 0, 0, 0.04),
+    inset 0 1px 0 rgba(255, 255, 255, 0.9),
+    inset 0 -2px 0 rgba(0, 0, 0, 0.04);
+  border: 1.5px solid rgba(255, 255, 255, 0.8);
+  transition: transform 0.18s ease, box-shadow 0.18s ease;
+}
+/* clay-card:active scale removed — dialogs carry clay-card and must not shrink on tap */
+
+/* Clay card with colour tint */
+.clay-card-brand {
+  background: linear-gradient(145deg, var(--brand-primary) 0%, var(--brand-primary-hover) 100%);
+  border-radius: 26px;
+  box-shadow:
+    0 10px 28px rgba(var(--brand-primary-rgb), 0.35),
+    0 3px 8px  rgba(var(--brand-primary-rgb), 0.2),
+    inset 0 1px 0 rgba(255, 255, 255, 0.25),
+    inset 0 -2px 0 rgba(0, 0, 0, 0.12);
+  border: 1.5px solid rgba(255, 255, 255, 0.2);
+}
+
+.clay-card-green {
+  background: linear-gradient(145deg, #1A7A4A, #15623B);
+  border-radius: 26px;
+  box-shadow:
+    0 10px 28px rgba(26, 122, 74, 0.30),
+    0 3px 8px  rgba(26, 122, 74, 0.18),
+    inset 0 1px 0 rgba(255, 255, 255, 0.22),
+    inset 0 -2px 0 rgba(0, 0, 0, 0.10);
+  border: 1.5px solid rgba(255, 255, 255, 0.18);
+}
+
+.clay-card-indigo {
+  background: linear-gradient(145deg, #6366F1, #4F46E5);
+  border-radius: 26px;
+  box-shadow:
+    0 10px 28px rgba(99, 102, 241, 0.30),
+    0 3px 8px  rgba(99, 102, 241, 0.18),
+    inset 0 1px 0 rgba(255, 255, 255, 0.22),
+    inset 0 -2px 0 rgba(0, 0, 0, 0.10);
+  border: 1.5px solid rgba(255, 255, 255, 0.18);
+}
+
+.clay-card-amber {
+  background: linear-gradient(145deg, #A0611A, #7D4C14);
+  border-radius: 26px;
+  box-shadow:
+    0 10px 28px rgba(160, 97, 26, 0.30),
+    0 3px 8px  rgba(160, 97, 26, 0.18),
+    inset 0 1px 0 rgba(255, 255, 255, 0.22),
+    inset 0 -2px 0 rgba(0, 0, 0, 0.10);
+  border: 1.5px solid rgba(255, 255, 255, 0.18);
+}
+
+/* Soft icon bubble */
+.clay-icon {
+  border-radius: 16px;
+  box-shadow:
+    0 4px 10px rgba(0, 0, 0, 0.07),
+    inset 0 1px 0 rgba(255, 255, 255, 0.9),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.7);
+}
+
+/* Clay pill badge */
+.clay-pill {
+  border-radius: 999px;
+  box-shadow:
+    0 3px 8px rgba(0, 0, 0, 0.08),
+    inset 0 1px 0 rgba(255, 255, 255, 0.85);
+  border: 1px solid rgba(255, 255, 255, 0.6);
+}
+
+/* Clay button */
+.clay-btn {
+  border-radius: 20px;
+  box-shadow:
+    0 6px 16px rgba(var(--brand-primary-rgb), 0.30),
+    0 2px 4px  rgba(var(--brand-primary-rgb), 0.18),
+    inset 0 1px 0 rgba(255, 255, 255, 0.22),
+    inset 0 -2px 0 rgba(0, 0, 0, 0.12);
+  border: 1.5px solid rgba(255, 255, 255, 0.2);
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+.clay-btn:active {
+  transform: scale(0.96);
+  box-shadow:
+    0 3px 8px rgba(var(--brand-primary-rgb), 0.22),
+    inset 0 1px 0 rgba(255, 255, 255, 0.18),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.10);
+}
+
+/* Floating pill nav bar */
+.clay-nav {
+  background: #ffffff;
+  border-radius: 28px;
+  box-shadow:
+    0 8px 32px rgba(0, 0, 0, 0.10),
+    0 2px 8px  rgba(0, 0, 0, 0.06),
+    inset 0 1px 0 rgba(255, 255, 255, 0.95),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.03);
+  border: 1.5px solid rgba(255, 255, 255, 0.85);
+}
+
+/* Pastel background for the whole app */
+.clay-bg {
+  background: linear-gradient(160deg, #FDF5F5 0%, #F5F0FB 40%, #EEF6FF 100%);
+  min-height: 100%;
+}
+
+/* Scrollbar hide utility */
+.scrollbar-hide::-webkit-scrollbar { display: none; }
+.scrollbar-hide { -ms-overflow-style: none; scrollbar-width: none; }
+
+/* ── Rain animation overlay ─────────────────────────────────────── */
+@keyframes rain-fall {
+  0%   { transform: translateY(-10px) translateX(0px);   opacity: 0; }
+  10%  { opacity: 1; }
+  90%  { opacity: 0.7; }
+  100% { transform: translateY(160px) translateX(-8px);  opacity: 0; }
+}
+
+@keyframes rain-splash {
+  0%   { transform: scale(0); opacity: 0.7; }
+  60%  { transform: scale(1.4); opacity: 0.4; }
+  100% { transform: scale(2); opacity: 0; }
+}
+
+.rain-drop {
+  position: absolute;
+  width: 1.5px;
+  border-radius: 2px;
+  background: linear-gradient(180deg, rgba(255,255,255,0) 0%, rgba(255,255,255,0.55) 100%);
+  animation: rain-fall linear infinite;
+  pointer-events: none;
+}
+
+.rain-thunder-flash {
+  animation: thunder-flash 6s ease-in-out infinite;
+}
+
+@keyframes thunder-flash {
+  0%, 88%, 92%, 100% { opacity: 0; }
+  90%                 { opacity: 0.18; }
+}

@@ -1,0 +1,562 @@
+{
+  "pbtResults": {
+    "9.1 Create `__tests__/messaging/types.test.ts` — property-based tests for pure helpers": {
+      "status": "passed",
+      "lastRunTimestamp": 1787904667965
+    },
+    "9.5 Create `__tests__/messaging/socket.server.test.ts` — unit + property tests for Socket.IO server": {
+      "status": "passed",
+      "lastRunTimestamp": 1787904200901
+    },
+    "9.3 Create `__tests__/messaging/messages.api.test.ts` — unit + property tests": {
+      "status": "passed",
+      "lastRunTimestamp": 1787905021793
+    },
+    "9.2 Create `__tests__/messaging/conversations.api.test.ts` — unit + property tests": {
+      "status": "passed",
+      "lastRunTimestamp": 1787905038847
+    }
+  },
+  "executionHistory": {
+    "1.1 Create `lib/types.ts` with all exported interfaces and helper functions": [
+      {
+        "executionId": "120df09d-39d8-4369-8798-fb91ebbfbe1b",
+        "chatSessionId": "sess_90c72703-3985-49a2-837f-fcf0c13084af",
+        "timestamp": 1787897280113
+      },
+      {
+        "executionId": "120df09d-39d8-4369-8798-fb91ebbfbe1b",
+        "chatSessionId": "sess_90c72703-3985-49a2-837f-fcf0c13084af",
+        "timestamp": 1787897296252
+      },
+      {
+        "executionId": "120df09d-39d8-4369-8798-fb91ebbfbe1b",
+        "chatSessionId": "sess_90c72703-3985-49a2-837f-fcf0c13084af",
+        "timestamp": 1787897382032
+      }
+    ],
+    "1.2 Create `lib/supabase-admin.ts` service-role client": [
+      {
+        "executionId": "120df09d-39d8-4369-8798-fb91ebbfbe1b",
+        "chatSessionId": "sess_90c72703-3985-49a2-837f-fcf0c13084af",
+        "timestamp": 1787897280228
+      },
+      {
+        "executionId": "120df09d-39d8-4369-8798-fb91ebbfbe1b",
+        "chatSessionId": "sess_90c72703-3985-49a2-837f-fcf0c13084af",
+        "timestamp": 1787897308003
+      },
+      {
+        "executionId": "120df09d-39d8-4369-8798-fb91ebbfbe1b",
+        "chatSessionId": "sess_90c72703-3985-49a2-837f-fcf0c13084af",
+        "timestamp": 1787897389244
+      }
+    ],
+    "1.3 Add required environment variables to `.env.local`": [
+      {
+        "executionId": "120df09d-39d8-4369-8798-fb91ebbfbe1b",
+        "chatSessionId": "sess_90c72703-3985-49a2-837f-fcf0c13084af",
+        "timestamp": 1787897280328
+      },
+      {
+        "executionId": "120df09d-39d8-4369-8798-fb91ebbfbe1b",
+        "chatSessionId": "sess_90c72703-3985-49a2-837f-fcf0c13084af",
+        "timestamp": 1787897313228
+      },
+      {
+        "executionId": "120df09d-39d8-4369-8798-fb91ebbfbe1b",
+        "chatSessionId": "sess_90c72703-3985-49a2-837f-fcf0c13084af",
+        "timestamp": 1787897394103
+      }
+    ],
+    "2.1 Create `app/api/conversations/route.ts` — GET and POST handlers": [
+      {
+        "executionId": "120df09d-39d8-4369-8798-fb91ebbfbe1b",
+        "chatSessionId": "sess_90c72703-3985-49a2-837f-fcf0c13084af",
+        "timestamp": 1787897280420
+      },
+      {
+        "executionId": "120df09d-39d8-4369-8798-fb91ebbfbe1b",
+        "chatSessionId": "sess_90c72703-3985-49a2-837f-fcf0c13084af",
+        "timestamp": 1787897403673
+      },
+      {
+        "executionId": "b57fd50c-0c31-46e5-b1c9-2ebb73d1c571",
+        "chatSessionId": "sess_90c72703-3985-49a2-837f-fcf0c13084af",
+        "timestamp": 1787903881192
+      }
+    ],
+    "2.2 Create `app/api/messages/route.ts` — GET, POST, and PATCH handlers": [
+      {
+        "executionId": "120df09d-39d8-4369-8798-fb91ebbfbe1b",
+        "chatSessionId": "sess_90c72703-3985-49a2-837f-fcf0c13084af",
+        "timestamp": 1787897280506
+      },
+      {
+        "executionId": "120df09d-39d8-4369-8798-fb91ebbfbe1b",
+        "chatSessionId": "sess_90c72703-3985-49a2-837f-fcf0c13084af",
+        "timestamp": 1787897408289
+      },
+      {
+        "executionId": "b57fd50c-0c31-46e5-b1c9-2ebb73d1c571",
+        "chatSessionId": "sess_90c72703-3985-49a2-837f-fcf0c13084af",
+        "timestamp": 1787903885929
+      }
+    ],
+    "2.3 Create `app/api/users/search/route.ts` — GET handler": [
+      {
+        "executionId": "120df09d-39d8-4369-8798-fb91ebbfbe1b",
+        "chatSessionId": "sess_90c72703-3985-49a2-837f-fcf0c13084af",
+        "timestamp": 1787897280587
+      },
+      {
+        "executionId": "120df09d-39d8-4369-8798-fb91ebbfbe1b",
+        "chatSessionId": "sess_90c72703-3985-49a2-837f-fcf0c13084af",
+        "timestamp": 1787897426028
+      },
+      {
+        "executionId": "b57fd50c-0c31-46e5-b1c9-2ebb73d1c571",
+        "chatSessionId": "sess_90c72703-3985-49a2-837f-fcf0c13084af",
+        "timestamp": 1787903886632
+      }
+    ],
+    "3.1 Create `socket-server.ts` standalone Socket.IO server": [
+      {
+        "executionId": "120df09d-39d8-4369-8798-fb91ebbfbe1b",
+        "chatSessionId": "sess_90c72703-3985-49a2-837f-fcf0c13084af",
+        "timestamp": 1787897280661
+      },
+      {
+        "executionId": "120df09d-39d8-4369-8798-fb91ebbfbe1b",
+        "chatSessionId": "sess_90c72703-3985-49a2-837f-fcf0c13084af",
+        "timestamp": 1787897436397
+      },
+      {
+        "executionId": "b57fd50c-0c31-46e5-b1c9-2ebb73d1c571",
+        "chatSessionId": "sess_90c72703-3985-49a2-837f-fcf0c13084af",
+        "timestamp": 1787903887472
+      }
+    ],
+    "4.1 Create `hooks/useSocket.ts`": [
+      {
+        "executionId": "120df09d-39d8-4369-8798-fb91ebbfbe1b",
+        "chatSessionId": "sess_90c72703-3985-49a2-837f-fcf0c13084af",
+        "timestamp": 1787897280838
+      },
+      {
+        "executionId": "169e996b-8f7d-422b-95ae-7fce891dfeb2",
+        "chatSessionId": "sess_90c72703-3985-49a2-837f-fcf0c13084af",
+        "timestamp": 1787898453110
+      },
+      {
+        "executionId": "169e996b-8f7d-422b-95ae-7fce891dfeb2",
+        "chatSessionId": "sess_90c72703-3985-49a2-837f-fcf0c13084af",
+        "timestamp": 1787898597238
+      }
+    ],
+    "4.2 Create `hooks/useWebRTC.ts`": [
+      {
+        "executionId": "120df09d-39d8-4369-8798-fb91ebbfbe1b",
+        "chatSessionId": "sess_90c72703-3985-49a2-837f-fcf0c13084af",
+        "timestamp": 1787897280980
+      },
+      {
+        "executionId": "169e996b-8f7d-422b-95ae-7fce891dfeb2",
+        "chatSessionId": "sess_90c72703-3985-49a2-837f-fcf0c13084af",
+        "timestamp": 1787898453851
+      },
+      {
+        "executionId": "169e996b-8f7d-422b-95ae-7fce891dfeb2",
+        "chatSessionId": "sess_90c72703-3985-49a2-837f-fcf0c13084af",
+        "timestamp": 1787898598090
+      }
+    ],
+    "5. Checkpoint — API and hooks foundation": [
+      {
+        "executionId": "120df09d-39d8-4369-8798-fb91ebbfbe1b",
+        "chatSessionId": "sess_90c72703-3985-49a2-837f-fcf0c13084af",
+        "timestamp": 1787897281077
+      },
+      {
+        "executionId": "b57fd50c-0c31-46e5-b1c9-2ebb73d1c571",
+        "chatSessionId": "sess_90c72703-3985-49a2-837f-fcf0c13084af",
+        "timestamp": 1787903894926
+      }
+    ],
+    "6.1 Create `components/messaging/MessageBubble.tsx`": [
+      {
+        "executionId": "120df09d-39d8-4369-8798-fb91ebbfbe1b",
+        "chatSessionId": "sess_90c72703-3985-49a2-837f-fcf0c13084af",
+        "timestamp": 1787897281175
+      },
+      {
+        "executionId": "169e996b-8f7d-422b-95ae-7fce891dfeb2",
+        "chatSessionId": "sess_90c72703-3985-49a2-837f-fcf0c13084af",
+        "timestamp": 1787898608362
+      },
+      {
+        "executionId": "169e996b-8f7d-422b-95ae-7fce891dfeb2",
+        "chatSessionId": "sess_90c72703-3985-49a2-837f-fcf0c13084af",
+        "timestamp": 1787898714196
+      }
+    ],
+    "6.2 Create `components/messaging/TypingIndicator.tsx`": [
+      {
+        "executionId": "120df09d-39d8-4369-8798-fb91ebbfbe1b",
+        "chatSessionId": "sess_90c72703-3985-49a2-837f-fcf0c13084af",
+        "timestamp": 1787897281261
+      },
+      {
+        "executionId": "169e996b-8f7d-422b-95ae-7fce891dfeb2",
+        "chatSessionId": "sess_90c72703-3985-49a2-837f-fcf0c13084af",
+        "timestamp": 1787898609222
+      },
+      {
+        "executionId": "169e996b-8f7d-422b-95ae-7fce891dfeb2",
+        "chatSessionId": "sess_90c72703-3985-49a2-837f-fcf0c13084af",
+        "timestamp": 1787898714816
+      }
+    ],
+    "6.3 Create `components/messaging/ConversationItem.tsx`": [
+      {
+        "executionId": "120df09d-39d8-4369-8798-fb91ebbfbe1b",
+        "chatSessionId": "sess_90c72703-3985-49a2-837f-fcf0c13084af",
+        "timestamp": 1787897281338
+      },
+      {
+        "executionId": "169e996b-8f7d-422b-95ae-7fce891dfeb2",
+        "chatSessionId": "sess_90c72703-3985-49a2-837f-fcf0c13084af",
+        "timestamp": 1787898610095
+      },
+      {
+        "executionId": "169e996b-8f7d-422b-95ae-7fce891dfeb2",
+        "chatSessionId": "sess_90c72703-3985-49a2-837f-fcf0c13084af",
+        "timestamp": 1787898715701
+      }
+    ],
+    "6.4 Create `components/messaging/ConversationList.tsx`": [
+      {
+        "executionId": "120df09d-39d8-4369-8798-fb91ebbfbe1b",
+        "chatSessionId": "sess_90c72703-3985-49a2-837f-fcf0c13084af",
+        "timestamp": 1787897281451
+      },
+      {
+        "executionId": "169e996b-8f7d-422b-95ae-7fce891dfeb2",
+        "chatSessionId": "sess_90c72703-3985-49a2-837f-fcf0c13084af",
+        "timestamp": 1787898722558
+      },
+      {
+        "executionId": "169e996b-8f7d-422b-95ae-7fce891dfeb2",
+        "chatSessionId": "sess_90c72703-3985-49a2-837f-fcf0c13084af",
+        "timestamp": 1787899591267
+      }
+    ],
+    "6.5 Create `components/messaging/MessageThread.tsx`": [
+      {
+        "executionId": "120df09d-39d8-4369-8798-fb91ebbfbe1b",
+        "chatSessionId": "sess_90c72703-3985-49a2-837f-fcf0c13084af",
+        "timestamp": 1787897281566
+      },
+      {
+        "executionId": "169e996b-8f7d-422b-95ae-7fce891dfeb2",
+        "chatSessionId": "sess_90c72703-3985-49a2-837f-fcf0c13084af",
+        "timestamp": 1787898723368
+      },
+      {
+        "executionId": "169e996b-8f7d-422b-95ae-7fce891dfeb2",
+        "chatSessionId": "sess_90c72703-3985-49a2-837f-fcf0c13084af",
+        "timestamp": 1787899591952
+      }
+    ],
+    "6.6 Create `components/messaging/NewConversationModal.tsx`": [
+      {
+        "executionId": "120df09d-39d8-4369-8798-fb91ebbfbe1b",
+        "chatSessionId": "sess_90c72703-3985-49a2-837f-fcf0c13084af",
+        "timestamp": 1787897281683
+      },
+      {
+        "executionId": "169e996b-8f7d-422b-95ae-7fce891dfeb2",
+        "chatSessionId": "sess_90c72703-3985-49a2-837f-fcf0c13084af",
+        "timestamp": 1787898724234
+      },
+      {
+        "executionId": "169e996b-8f7d-422b-95ae-7fce891dfeb2",
+        "chatSessionId": "sess_90c72703-3985-49a2-837f-fcf0c13084af",
+        "timestamp": 1787899592905
+      }
+    ],
+    "6.7 Create `components/messaging/IncomingCallAlert.tsx`": [
+      {
+        "executionId": "120df09d-39d8-4369-8798-fb91ebbfbe1b",
+        "chatSessionId": "sess_90c72703-3985-49a2-837f-fcf0c13084af",
+        "timestamp": 1787897281793
+      },
+      {
+        "executionId": "169e996b-8f7d-422b-95ae-7fce891dfeb2",
+        "chatSessionId": "sess_90c72703-3985-49a2-837f-fcf0c13084af",
+        "timestamp": 1787898725153
+      },
+      {
+        "executionId": "169e996b-8f7d-422b-95ae-7fce891dfeb2",
+        "chatSessionId": "sess_90c72703-3985-49a2-837f-fcf0c13084af",
+        "timestamp": 1787899593790
+      }
+    ],
+    "6.8 Create `components/messaging/VideoCallOverlay.tsx`": [
+      {
+        "executionId": "120df09d-39d8-4369-8798-fb91ebbfbe1b",
+        "chatSessionId": "sess_90c72703-3985-49a2-837f-fcf0c13084af",
+        "timestamp": 1787897281899
+      },
+      {
+        "executionId": "169e996b-8f7d-422b-95ae-7fce891dfeb2",
+        "chatSessionId": "sess_90c72703-3985-49a2-837f-fcf0c13084af",
+        "timestamp": 1787898725808
+      },
+      {
+        "executionId": "169e996b-8f7d-422b-95ae-7fce891dfeb2",
+        "chatSessionId": "sess_90c72703-3985-49a2-837f-fcf0c13084af",
+        "timestamp": 1787899594671
+      }
+    ],
+    "7.1 Create `app/messaging/page.tsx` — root layout and wiring": [
+      {
+        "executionId": "120df09d-39d8-4369-8798-fb91ebbfbe1b",
+        "chatSessionId": "sess_90c72703-3985-49a2-837f-fcf0c13084af",
+        "timestamp": 1787897282093
+      },
+      {
+        "executionId": "169e996b-8f7d-422b-95ae-7fce891dfeb2",
+        "chatSessionId": "sess_90c72703-3985-49a2-837f-fcf0c13084af",
+        "timestamp": 1787899600106
+      },
+      {
+        "executionId": "b239afa8-ff35-4f5c-85dd-492986a1807d",
+        "chatSessionId": "sess_90c72703-3985-49a2-837f-fcf0c13084af",
+        "timestamp": 1787901462853
+      }
+    ],
+    "8. Checkpoint — Full UI wired end-to-end": [
+      {
+        "executionId": "120df09d-39d8-4369-8798-fb91ebbfbe1b",
+        "chatSessionId": "sess_90c72703-3985-49a2-837f-fcf0c13084af",
+        "timestamp": 1787897282168
+      },
+      {
+        "executionId": "b57fd50c-0c31-46e5-b1c9-2ebb73d1c571",
+        "chatSessionId": "sess_90c72703-3985-49a2-837f-fcf0c13084af",
+        "timestamp": 1787903895737
+      }
+    ],
+    "9.1 Create `__tests__/messaging/types.test.ts` — property-based tests for pure helpers": [
+      {
+        "executionId": "120df09d-39d8-4369-8798-fb91ebbfbe1b",
+        "chatSessionId": "sess_90c72703-3985-49a2-837f-fcf0c13084af",
+        "timestamp": 1787897282229
+      },
+      {
+        "executionId": "b239afa8-ff35-4f5c-85dd-492986a1807d",
+        "chatSessionId": "sess_90c72703-3985-49a2-837f-fcf0c13084af",
+        "timestamp": 1787901495814
+      },
+      {
+        "executionId": "b57fd50c-0c31-46e5-b1c9-2ebb73d1c571",
+        "chatSessionId": "sess_90c72703-3985-49a2-837f-fcf0c13084af",
+        "timestamp": 1787903900831
+      },
+      {
+        "executionId": "b57fd50c-0c31-46e5-b1c9-2ebb73d1c571",
+        "chatSessionId": "sess_90c72703-3985-49a2-837f-fcf0c13084af",
+        "timestamp": 1787905059870
+      }
+    ],
+    "9.2 Create `__tests__/messaging/conversations.api.test.ts` — unit + property tests": [
+      {
+        "executionId": "120df09d-39d8-4369-8798-fb91ebbfbe1b",
+        "chatSessionId": "sess_90c72703-3985-49a2-837f-fcf0c13084af",
+        "timestamp": 1787897282288
+      },
+      {
+        "executionId": "b239afa8-ff35-4f5c-85dd-492986a1807d",
+        "chatSessionId": "sess_90c72703-3985-49a2-837f-fcf0c13084af",
+        "timestamp": 1787901496772
+      },
+      {
+        "executionId": "b57fd50c-0c31-46e5-b1c9-2ebb73d1c571",
+        "chatSessionId": "sess_90c72703-3985-49a2-837f-fcf0c13084af",
+        "timestamp": 1787903901765
+      },
+      {
+        "executionId": "b57fd50c-0c31-46e5-b1c9-2ebb73d1c571",
+        "chatSessionId": "sess_90c72703-3985-49a2-837f-fcf0c13084af",
+        "timestamp": 1787905060784
+      }
+    ],
+    "9.3 Create `__tests__/messaging/messages.api.test.ts` — unit + property tests": [
+      {
+        "executionId": "120df09d-39d8-4369-8798-fb91ebbfbe1b",
+        "chatSessionId": "sess_90c72703-3985-49a2-837f-fcf0c13084af",
+        "timestamp": 1787897282340
+      },
+      {
+        "executionId": "b239afa8-ff35-4f5c-85dd-492986a1807d",
+        "chatSessionId": "sess_90c72703-3985-49a2-837f-fcf0c13084af",
+        "timestamp": 1787901497681
+      },
+      {
+        "executionId": "b57fd50c-0c31-46e5-b1c9-2ebb73d1c571",
+        "chatSessionId": "sess_90c72703-3985-49a2-837f-fcf0c13084af",
+        "timestamp": 1787903902640
+      },
+      {
+        "executionId": "b57fd50c-0c31-46e5-b1c9-2ebb73d1c571",
+        "chatSessionId": "sess_90c72703-3985-49a2-837f-fcf0c13084af",
+        "timestamp": 1787905061717
+      }
+    ],
+    "9.4 Create `__tests__/messaging/users.search.api.test.ts` — unit + property tests": [
+      {
+        "executionId": "120df09d-39d8-4369-8798-fb91ebbfbe1b",
+        "chatSessionId": "sess_90c72703-3985-49a2-837f-fcf0c13084af",
+        "timestamp": 1787897282397
+      },
+      {
+        "executionId": "b239afa8-ff35-4f5c-85dd-492986a1807d",
+        "chatSessionId": "sess_90c72703-3985-49a2-837f-fcf0c13084af",
+        "timestamp": 1787901498620
+      },
+      {
+        "executionId": "b57fd50c-0c31-46e5-b1c9-2ebb73d1c571",
+        "chatSessionId": "sess_90c72703-3985-49a2-837f-fcf0c13084af",
+        "timestamp": 1787903903575
+      },
+      {
+        "executionId": "b57fd50c-0c31-46e5-b1c9-2ebb73d1c571",
+        "chatSessionId": "sess_90c72703-3985-49a2-837f-fcf0c13084af",
+        "timestamp": 1787905058894
+      }
+    ],
+    "9.5 Create `__tests__/messaging/socket.server.test.ts` — unit + property tests for Socket.IO server": [
+      {
+        "executionId": "120df09d-39d8-4369-8798-fb91ebbfbe1b",
+        "chatSessionId": "sess_90c72703-3985-49a2-837f-fcf0c13084af",
+        "timestamp": 1787897282454
+      },
+      {
+        "executionId": "b239afa8-ff35-4f5c-85dd-492986a1807d",
+        "chatSessionId": "sess_90c72703-3985-49a2-837f-fcf0c13084af",
+        "timestamp": 1787901499610
+      },
+      {
+        "executionId": "b57fd50c-0c31-46e5-b1c9-2ebb73d1c571",
+        "chatSessionId": "sess_90c72703-3985-49a2-837f-fcf0c13084af",
+        "timestamp": 1787903904530
+      },
+      {
+        "executionId": "b57fd50c-0c31-46e5-b1c9-2ebb73d1c571",
+        "chatSessionId": "sess_90c72703-3985-49a2-837f-fcf0c13084af",
+        "timestamp": 1787905058011
+      }
+    ],
+    "9.6 Create `__tests__/messaging/useSocket.test.ts` — renderHook lifecycle tests": [
+      {
+        "executionId": "120df09d-39d8-4369-8798-fb91ebbfbe1b",
+        "chatSessionId": "sess_90c72703-3985-49a2-837f-fcf0c13084af",
+        "timestamp": 1787897282506
+      },
+      {
+        "executionId": "b57fd50c-0c31-46e5-b1c9-2ebb73d1c571",
+        "chatSessionId": "sess_90c72703-3985-49a2-837f-fcf0c13084af",
+        "timestamp": 1787905066738
+      },
+      {
+        "executionId": "b57fd50c-0c31-46e5-b1c9-2ebb73d1c571",
+        "chatSessionId": "sess_90c72703-3985-49a2-837f-fcf0c13084af",
+        "timestamp": 1787905572558
+      }
+    ],
+    "9.7 Create `__tests__/messaging/useWebRTC.test.ts` — smoke tests and example tests": [
+      {
+        "executionId": "120df09d-39d8-4369-8798-fb91ebbfbe1b",
+        "chatSessionId": "sess_90c72703-3985-49a2-837f-fcf0c13084af",
+        "timestamp": 1787897282570
+      },
+      {
+        "executionId": "b57fd50c-0c31-46e5-b1c9-2ebb73d1c571",
+        "chatSessionId": "sess_90c72703-3985-49a2-837f-fcf0c13084af",
+        "timestamp": 1787905067715
+      },
+      {
+        "executionId": "b57fd50c-0c31-46e5-b1c9-2ebb73d1c571",
+        "chatSessionId": "sess_90c72703-3985-49a2-837f-fcf0c13084af",
+        "timestamp": 1787905573540
+      }
+    ],
+    "10. Final checkpoint — Ensure all tests pass": [
+      {
+        "executionId": "120df09d-39d8-4369-8798-fb91ebbfbe1b",
+        "chatSessionId": "sess_90c72703-3985-49a2-837f-fcf0c13084af",
+        "timestamp": 1787897282656
+      },
+      {
+        "executionId": "b57fd50c-0c31-46e5-b1c9-2ebb73d1c571",
+        "chatSessionId": "sess_90c72703-3985-49a2-837f-fcf0c13084af",
+        "timestamp": 1787905578602
+      },
+      {
+        "executionId": "32ac38ce-1a86-4c43-b0ea-c92bdcac330b",
+        "chatSessionId": "sess_90c72703-3985-49a2-837f-fcf0c13084af",
+        "timestamp": 1787906107233
+      }
+    ],
+    "1. Shared types and utilities (`lib/types.ts`, `lib/supabase-admin.ts`)": [
+      {
+        "executionId": "120df09d-39d8-4369-8798-fb91ebbfbe1b",
+        "chatSessionId": "sess_90c72703-3985-49a2-837f-fcf0c13084af",
+        "timestamp": 1787897394157
+      }
+    ],
+    "4. React Hooks": [
+      {
+        "executionId": "169e996b-8f7d-422b-95ae-7fce891dfeb2",
+        "chatSessionId": "sess_90c72703-3985-49a2-837f-fcf0c13084af",
+        "timestamp": 1787898598174
+      }
+    ],
+    "6. Messaging UI Components": [
+      {
+        "executionId": "169e996b-8f7d-422b-95ae-7fce891dfeb2",
+        "chatSessionId": "sess_90c72703-3985-49a2-837f-fcf0c13084af",
+        "timestamp": 1787899594780
+      }
+    ],
+    "7. Messaging Page (`app/messaging/page.tsx`)": [
+      {
+        "executionId": "b239afa8-ff35-4f5c-85dd-492986a1807d",
+        "chatSessionId": "sess_90c72703-3985-49a2-837f-fcf0c13084af",
+        "timestamp": 1787901462919
+      }
+    ],
+    "2. API Routes": [
+      {
+        "executionId": "b57fd50c-0c31-46e5-b1c9-2ebb73d1c571",
+        "chatSessionId": "sess_90c72703-3985-49a2-837f-fcf0c13084af",
+        "timestamp": 1787903886758
+      }
+    ],
+    "3. Socket.IO Server (`socket-server.ts`)": [
+      {
+        "executionId": "b57fd50c-0c31-46e5-b1c9-2ebb73d1c571",
+        "chatSessionId": "sess_90c72703-3985-49a2-837f-fcf0c13084af",
+        "timestamp": 1787903887536
+      }
+    ],
+    "9. Test Suite": [
+      {
+        "executionId": "b57fd50c-0c31-46e5-b1c9-2ebb73d1c571",
+        "chatSessionId": "sess_90c72703-3985-49a2-837f-fcf0c13084af",
+        "timestamp": 1787905573684
+      }
+    ]
+  }
+}

@@ -75,7 +75,7 @@ function MobileTimesheetCard({
   const initials = name.split(" ").map(n => n[0]).join("").toUpperCase().slice(0, 2);
 
   return (
-    <div className="bg-white rounded-3xl border border-gray-100 p-4 shadow-sm mb-3">
+    <div className="clay-card p-4 mb-3">
       <div className="flex items-center justify-between mb-4">
         <div className="flex items-center gap-3">
           {profilePicture ? (
@@ -518,16 +518,16 @@ function TimesheetPage() {
   // ── Render ─────────────────────────────────────────────────────────────────
 
   return (
-    <div className="min-h-screen bg-brand-bg">
+    <div className="min-h-screen clay-bg">
 
       {/* ── Header ── */}
-      <header className="sticky top-0 z-30 bg-white border-b border-gray-100 flex items-center justify-between px-4 h-14 gap-3">
+      <header className="sticky top-0 z-30 clay-nav flex items-center justify-between px-4 h-14 gap-3">
         <div className="flex items-center gap-3">
 
           {/* Back button */}
           <button
             onClick={handleBack}
-            className="w-8 h-8 rounded-xl border border-gray-200 flex items-center justify-center text-gray-500 hover:bg-gray-50 hover:border-gray-300 hover:text-brand-primary transition-all active:scale-95"
+            className="clay-card w-8 h-8 rounded-xl flex items-center justify-center text-gray-500 transition-all active:scale-95"
             title="Back to Activity Planner"
           >
             <ArrowLeft size={14} />
@@ -594,7 +594,7 @@ function TimesheetPage() {
 
           <button
             onClick={exportToExcel}
-            className="flex items-center gap-2 bg-brand-primary text-white h-9 px-4 rounded-2xl text-[12px] font-semibold hover:bg-brand-primary-hover transition-all shadow-md shadow-brand-primary/20 active:scale-[0.97]"
+            className="clay-btn flex items-center gap-2 bg-[var(--brand-primary)] text-white h-9 px-4 rounded-2xl text-[12px] font-semibold transition-all active:scale-[0.97]"
           >
             <DownloadCloud size={14} />
             <span className="hidden sm:inline">Export</span>
@@ -612,8 +612,8 @@ function TimesheetPage() {
             { label: "Undertime", value: summaryStats.totalUndertime.toFixed(1) + "h", icon: <ArrowDownLeft size={15} />, color: "#A0611A", bg: "#FDF4E7" },
             { label: "Overtime", value: summaryStats.totalOvertime.toFixed(1) + "h", icon: <ArrowUpRight size={15} />, color: "#1A7A4A", bg: "#EEF7F2" },
           ].map((s) => (
-            <div key={s.label} className="bg-white rounded-2xl border border-gray-100 p-4 shadow-sm">
-              <div className="w-7 h-7 rounded-[9px] flex items-center justify-center mb-2.5 flex-shrink-0" style={{ background: s.bg, color: s.color }}>
+            <div key={s.label} className="clay-card p-4">
+              <div className="clay-icon w-7 h-7 rounded-[9px] flex items-center justify-center mb-2.5 flex-shrink-0" style={{ background: s.bg, color: s.color }}>
                 {s.icon}
               </div>
               <p className="text-[20px] font-semibold text-gray-900 leading-tight">{s.value}</p>
@@ -630,7 +630,7 @@ function TimesheetPage() {
             placeholder="Search by name..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="w-full rounded-2xl border border-gray-200 bg-white pl-9 pr-4 py-2.5 text-[13px] outline-none focus:border-brand-primary focus:ring-2 focus:ring-brand-primary/10 transition-all"
+            className="w-full clay-card pl-9 pr-4 py-2.5 text-[13px] outline-none focus:ring-2 focus:ring-[var(--brand-primary)]/10 transition-all"
           />
           {loading && (
             <div className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 border-2 border-gray-200 border-t-brand-primary rounded-full animate-spin" />
@@ -640,7 +640,7 @@ function TimesheetPage() {
         {/* ── Mobile Card List (Visible on Mobile only) ── */}
         <div className="sm:hidden">
           {visibleRows.length === 0 ? (
-            <div className="bg-white rounded-3xl border border-gray-100 px-4 py-12 text-center shadow-sm">
+            <div className="clay-card px-4 py-12 text-center">
               <div className="w-10 h-10 rounded-2xl bg-gray-50 flex items-center justify-center mx-auto mb-3">
                 <Clock size={18} className="text-gray-300" />
               </div>
@@ -666,7 +666,7 @@ function TimesheetPage() {
         </div>
 
         {/* ── Table (Hidden on Mobile) ── */}
-        <div className="hidden sm:block bg-white rounded-3xl border border-gray-100 overflow-hidden shadow-sm">
+        <div className="hidden sm:block clay-card overflow-hidden">
           <div className="px-5 py-4 border-b border-gray-100 flex items-center justify-between">
             <div>
               <p className="text-[13px] font-semibold text-gray-800">Timesheet Summary</p>
@@ -802,7 +802,7 @@ function TimesheetPage() {
         <Dialog open onOpenChange={() => setSelectedRef(null)}>
           <DialogContent className="p-0 rounded-[28px] max-w-sm w-full border-0 shadow-2xl overflow-hidden">
             {/* Header */}
-            <div className="bg-brand-primary px-6 pt-5 pb-5">
+            <div className="clay-card-brand rounded-none px-6 pt-5 pb-5">
               <div className="flex items-center gap-3 mb-4">
                 <div className="w-10 h-10 rounded-full bg-white/20 flex items-center justify-center text-white font-bold text-[14px]">
                   {details.name.split(" ").map((n: string) => n[0]).join("").toUpperCase().slice(0, 2)}
@@ -827,13 +827,13 @@ function TimesheetPage() {
             </div>
 
             {/* Daily breakdown */}
-            <div className="bg-[#F9F6F4] px-5 py-4 max-h-80 overflow-y-auto">
+            <div className="clay-bg px-5 py-4 max-h-80 overflow-y-auto">
               <p className="text-[10px] font-semibold text-gray-400 uppercase tracking-widest mb-3">Daily Hours</p>
               <div className="flex flex-col gap-2">
                 {details.dayHeaders.map(({ dateStr, label }: DailyLog) => {
                   const hrs = details.week[dateStr] ?? 0;
                   return (
-                    <div key={dateStr} className="flex items-center justify-between bg-white rounded-2xl border border-gray-100 px-4 py-3">
+                    <div key={dateStr} className="clay-card flex items-center justify-between px-4 py-3">
                       <span className="text-[12px] text-gray-600 font-medium">{label}</span>
                       {hrs > 0 ? (
                         <span className="inline-flex items-center justify-center rounded-xl bg-[#E6F1FB] text-[#185FA5] px-3 py-1 text-[12px] font-bold">
@@ -852,7 +852,7 @@ function TimesheetPage() {
             <div className="bg-white px-5 py-4 border-t border-gray-100">
               <button
                 onClick={() => setSelectedRef(null)}
-                className="w-full rounded-2xl py-3 bg-brand-primary text-white font-semibold text-[14px] hover:bg-brand-primary-hover transition-colors active:scale-[0.98]"
+                className="clay-btn w-full rounded-2xl py-3 bg-[var(--brand-primary)] text-white font-semibold text-[14px] transition-colors active:scale-[0.98]"
               >
                 Close
               </button>

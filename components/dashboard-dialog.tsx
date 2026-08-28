@@ -339,7 +339,7 @@ export default function ActivityDialog({ open, onOpenChange, selectedEvent, user
         </VisuallyHidden>
 
         {/* Header */}
-        <div className="bg-brand-primary px-6 pt-5 pb-8">
+        <div className="clay-card-brand rounded-none px-6 pt-5 pb-8">
           <div className="flex items-center gap-3 mb-6">
             <button
               onClick={() => onOpenChange(false)}
@@ -381,14 +381,14 @@ export default function ActivityDialog({ open, onOpenChange, selectedEvent, user
         </div>
 
         {/* Body */}
-        <div className="bg-brand-bg px-5 py-5 flex flex-col gap-3 -mt-4 rounded-t-[24px] relative z-10">
+        <div className="flex-1 overflow-y-auto clay-bg px-5 py-5 flex flex-col gap-3 -mt-4 rounded-t-[24px] relative z-10">
 
           {selectedEvent ? (
             <>
               {/* Site Visit Account */}
               {selectedEvent.SiteVisitAccount && (
-                <div className="bg-white rounded-2xl border border-gray-100 px-4 py-3 flex items-start gap-3">
-                  <div className="w-8 h-8 rounded-xl bg-[#FDF4E7] flex items-center justify-center flex-shrink-0">
+                <div className="clay-card px-4 py-3 flex items-start gap-3">
+                  <div className="clay-icon w-8 h-8 rounded-xl bg-[#FDF4E7] flex items-center justify-center flex-shrink-0">
                     <Building2 size={14} className="text-[#A0611A]" />
                   </div>
                   <div>
@@ -399,9 +399,9 @@ export default function ActivityDialog({ open, onOpenChange, selectedEvent, user
               )}
 
               {/* Date & Time */}
-              <div className="bg-white rounded-2xl border border-gray-100 px-4 py-3 grid grid-cols-2 gap-4">
+              <div className="clay-card px-4 py-3 grid grid-cols-2 gap-4">
                 <div className="flex items-start gap-3">
-                  <div className="w-8 h-8 rounded-xl bg-brand-light flex items-center justify-center flex-shrink-0">
+                  <div className="clay-icon w-8 h-8 rounded-xl bg-[var(--brand-light)] flex items-center justify-center flex-shrink-0">
                     <Calendar size={14} className="text-brand-primary" />
                   </div>
                   <div>
@@ -412,7 +412,7 @@ export default function ActivityDialog({ open, onOpenChange, selectedEvent, user
                   </div>
                 </div>
                 <div className="flex items-start gap-3">
-                  <div className="w-8 h-8 rounded-xl bg-[#E6F1FB] flex items-center justify-center flex-shrink-0">
+                  <div className="clay-icon w-8 h-8 rounded-xl bg-[#E6F1FB] flex items-center justify-center flex-shrink-0">
                     <Clock size={14} className="text-[#185FA5]" />
                   </div>
                   <div>
@@ -425,8 +425,8 @@ export default function ActivityDialog({ open, onOpenChange, selectedEvent, user
               </div>
 
               {/* Location */}
-              <div className="bg-white rounded-2xl border border-gray-100 px-4 py-3 flex items-start gap-3">
-                <div className="w-8 h-8 rounded-xl bg-brand-light flex items-center justify-center flex-shrink-0">
+              <div className="clay-card px-4 py-3 flex items-start gap-3">
+                <div className="clay-icon w-8 h-8 rounded-xl bg-[var(--brand-light)] flex items-center justify-center flex-shrink-0">
                   <Navigation size={14} className="text-brand-primary" />
                 </div>
                 <div className="flex-1 min-w-0">
@@ -454,7 +454,7 @@ export default function ActivityDialog({ open, onOpenChange, selectedEvent, user
 
               {/* Photo Verification */}
               {selectedEvent.PhotoURL && (
-                <div className="bg-white rounded-2xl border border-gray-100 p-1 flex flex-col">
+                <div className="clay-card p-1 flex flex-col">
                   <div className="flex items-center justify-between px-3 py-2 border-b border-gray-50">
                     <div className="flex items-center gap-2">
                       <Camera size={13} className="text-brand-primary" />
@@ -463,7 +463,7 @@ export default function ActivityDialog({ open, onOpenChange, selectedEvent, user
                     <button
                       onClick={downloadPhoto}
                       disabled={isDownloading}
-                      className="flex items-center gap-1.5 px-3 py-1.5 bg-brand-primary text-white rounded-lg text-[11px] font-semibold hover:bg-brand-primary-hover transition-colors active:scale-95 disabled:opacity-50"
+                      className="clay-btn flex items-center gap-1.5 px-3 py-1.5 bg-[var(--brand-primary)] text-white rounded-lg text-[11px] font-semibold transition-colors active:scale-95 disabled:opacity-50"
                     >
                       {isDownloading ? (
                         <Loader2 size={12} className="animate-spin" />
@@ -485,8 +485,8 @@ export default function ActivityDialog({ open, onOpenChange, selectedEvent, user
 
               {/* Remarks */}
               {selectedEvent.Remarks && (
-                <div className="bg-white rounded-2xl border border-gray-100 px-4 py-3 flex items-start gap-3">
-                  <div className="w-8 h-8 rounded-xl bg-gray-50 flex items-center justify-center flex-shrink-0">
+                <div className="clay-card px-4 py-3 flex items-start gap-3">
+                  <div className="clay-icon w-8 h-8 rounded-xl bg-gray-50 flex items-center justify-center flex-shrink-0">
                     <FileText size={14} className="text-gray-400" />
                   </div>
                   <div>
@@ -498,7 +498,7 @@ export default function ActivityDialog({ open, onOpenChange, selectedEvent, user
 
               <button
                 onClick={() => onOpenChange(false)}
-                className="w-full mt-1 rounded-2xl py-3.5 bg-brand-primary text-white font-semibold text-[14px] hover:bg-brand-primary-hover transition-colors active:scale-[0.98]"
+                className="clay-btn w-full mt-1 rounded-2xl py-3.5 bg-[var(--brand-primary)] text-white font-semibold text-[14px] transition-colors active:scale-[0.98]"
               >
                 Close
               </button>

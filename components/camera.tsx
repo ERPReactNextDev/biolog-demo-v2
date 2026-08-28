@@ -535,9 +535,9 @@ export default function Camera({
       {!permissionGiven && (
         <button
           onClick={requestPermission}
-          className="w-full rounded-2xl border-2 border-dashed border-gray-200 bg-[#F9F6F4] py-8 flex flex-col items-center gap-3 hover:border-[#CC1318]/40 hover:bg-[#FEF0F0] transition-all group"
+          className="w-full clay-card rounded-[20px] border-2 border-dashed border-gray-200 py-8 flex flex-col items-center gap-3 hover:border-[#CC1318]/40 transition-all group"
         >
-          <div className="w-14 h-14 rounded-2xl bg-[#FEF0F0] flex items-center justify-center group-hover:bg-[#CC1318] transition-colors">
+          <div className="clay-icon w-14 h-14 rounded-2xl bg-[#FEF0F0] flex items-center justify-center group-hover:bg-[#CC1318] transition-colors">
             <CameraIcon size={24} className="text-[#CC1318] group-hover:text-white transition-colors" />
           </div>
           <div className="text-center">
@@ -551,7 +551,7 @@ export default function Camera({
       {permissionGiven && !capturedImage && (
         <>
           {!skipFaceVerification && faceStatus !== "idle" && (
-            <div className={`flex items-center gap-2 rounded-2xl px-3 py-2 ${statusBg}`}>
+            <div className={`clay-pill flex items-center gap-2 rounded-2xl px-3 py-2 ${statusBg}`}>
               {(faceStatus === "no-face" || faceStatus === "multiple" || (faceStatus === "detected" && !isGreenStatus)) && (
                 <AlertCircle size={13} style={{ color: statusColor }} />
               )}
@@ -566,7 +566,7 @@ export default function Camera({
           )}
 
           <div
-            className={`relative w-full select-none overflow-hidden rounded-2xl border border-gray-200 bg-black transition-all ${canTap ? "cursor-pointer active:scale-[0.995]" : "cursor-not-allowed"} ${isFullscreen ? "fixed inset-0 z-50 rounded-none aspect-video" : ""}`}
+            className={`clay-card relative w-full select-none overflow-hidden transition-all ${canTap ? "cursor-pointer active:scale-[0.995]" : "cursor-not-allowed"} ${isFullscreen ? "fixed inset-0 z-50 rounded-none aspect-video" : ""}`}
             onClick={handleTap}
             onTouchStart={(e) => { e.preventDefault(); handleTap(); }}
             style={{ aspectRatio: isFullscreen ? undefined : "4/3" }}
@@ -636,7 +636,7 @@ export default function Camera({
             {devices.length > 1 && (
               <button
                 onClick={flipCamera}
-                className="flex items-center gap-2 bg-white border border-gray-200 rounded-2xl px-4 py-2.5 text-[12px] font-semibold text-gray-600 hover:border-gray-300 hover:bg-gray-50 transition-all active:scale-95 flex-shrink-0"
+                className="clay-card flex items-center gap-2 rounded-2xl px-4 py-2.5 text-[12px] font-semibold text-gray-600 transition-all active:scale-95 flex-shrink-0"
               >
                 <SwitchCamera size={15} />
                 Flip
@@ -660,11 +660,11 @@ export default function Camera({
       {/* Captured photo preview */}
       {capturedImage && (
         <div className="flex flex-col gap-3">
-          <div className="flex items-center gap-2 bg-[#EEF7F2] rounded-2xl px-3 py-2.5">
+          <div className="clay-pill flex items-center gap-2 bg-[#EEF7F2] rounded-2xl px-3 py-2.5">
             <CheckCircle2 size={15} className="text-[#1A7A4A] flex-shrink-0" />
             <span className="text-[12px] font-semibold text-[#1A7A4A]">Photo captured successfully</span>
           </div>
-          <div className="relative overflow-hidden rounded-2xl border border-gray-200">
+          <div className="clay-card relative overflow-hidden">
             <img src={capturedImage} alt="Captured" className="w-full object-cover" style={{ aspectRatio: "4/3" }} />
             <div className="absolute top-3 right-3 w-8 h-8 rounded-full bg-[#1A7A4A] flex items-center justify-center shadow-lg">
               <CheckCircle2 size={16} className="text-white" />
@@ -672,7 +672,7 @@ export default function Camera({
           </div>
           <button
             onClick={retake}
-            className="w-full flex items-center justify-center gap-2 bg-white border border-gray-200 rounded-2xl py-3 text-[13px] font-semibold text-gray-600 hover:border-[#CC1318]/40 hover:bg-[#FEF0F0] hover:text-[#CC1318] transition-all active:scale-[0.98]"
+            className="clay-card w-full flex items-center justify-center gap-2 rounded-2xl py-3 text-[13px] font-semibold text-gray-600 hover:text-[#CC1318] transition-all active:scale-[0.98]"
           >
             <RefreshCcw size={14} />
             Retake Photo

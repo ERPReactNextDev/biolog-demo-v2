@@ -247,7 +247,7 @@ function GPSReportPage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-[#F9F6F4] flex items-center justify-center">
+      <div className="min-h-screen clay-bg flex items-center justify-center">
         <div className="flex flex-col items-center gap-3">
           <div className="w-8 h-8 border-2 border-gray-200 border-t-[#CC1318] rounded-full animate-spin" />
           <p className="text-[12px] text-gray-400">Loading...</p>
@@ -257,19 +257,13 @@ function GPSReportPage() {
   }
 
   return (
-    <div className="min-h-screen bg-[#F9F6F4] flex flex-col">
+    <div className="min-h-screen clay-bg flex flex-col">
       {/* Header */}
-      <div
-        className="px-5 pt-12 pb-6 flex-shrink-0"
-        style={{
-          background:
-            "linear-gradient(145deg, var(--brand-primary) 0%, var(--brand-primary-hover) 100%)",
-        }}
-      >
+      <div className="clay-card-brand rounded-none px-5 pt-12 pb-6 flex-shrink-0">
         <div className="flex items-center gap-3 mb-4">
           <button
             onClick={goBack}
-            className="w-10 h-10 rounded-xl bg-white/20 flex items-center justify-center text-white hover:bg-white/30 transition-colors"
+            className="w-10 h-10 rounded-xl bg-white/20 flex items-center justify-center text-white hover:bg-white/30 transition-colors clay-icon"
           >
             <ChevronLeft size={20} />
           </button>
@@ -289,9 +283,9 @@ function GPSReportPage() {
         <form onSubmit={handleSubmit} className="flex flex-col gap-5">
           {/* User Info Card */}
           {userDetails && (
-            <div className="bg-white rounded-2xl border border-gray-100 p-4 shadow-sm">
+            <div className="clay-card p-4">
               <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-[14px] bg-[var(--brand-light)] flex items-center justify-center flex-shrink-0">
+                <div className="clay-icon w-10 h-10 rounded-[14px] bg-[var(--brand-light)] flex items-center justify-center flex-shrink-0">
                   <FileText size={18} className="text-[var(--brand-primary)]" />
                 </div>
                 <div className="flex-1 min-w-0">
@@ -307,9 +301,9 @@ function GPSReportPage() {
           )}
 
           {/* Photo Upload */}
-          <div className="bg-white rounded-2xl border border-gray-100 p-4 shadow-sm">
+          <div className="clay-card p-4">
             <div className="flex items-center gap-3 mb-4">
-              <div className="w-10 h-10 rounded-[14px] bg-[#E6F1FB] flex items-center justify-center flex-shrink-0">
+              <div className="clay-icon w-10 h-10 rounded-[14px] bg-[#E6F1FB] flex items-center justify-center flex-shrink-0">
                 <Camera size={18} className="text-[#185FA5]" />
               </div>
               <div>
@@ -363,9 +357,9 @@ function GPSReportPage() {
           </div>
 
           {/* Date Selection */}
-          <div className="bg-white rounded-2xl border border-gray-100 p-4 shadow-sm">
+          <div className="clay-card p-4">
             <div className="flex items-center gap-3 mb-4">
-              <div className="w-10 h-10 rounded-[14px] bg-[#EEF7F2] flex items-center justify-center flex-shrink-0">
+              <div className="clay-icon w-10 h-10 rounded-[14px] bg-[#EEF7F2] flex items-center justify-center flex-shrink-0">
                 <Calendar size={18} className="text-[#1A7A4A]" />
               </div>
               <div>
@@ -393,7 +387,7 @@ function GPSReportPage() {
                     required
                     value={loginDate}
                     onChange={(e) => setLoginDate(e.target.value)}
-                    className="w-full rounded-xl border border-gray-100 bg-gray-50 pl-9 pr-3 py-2.5 text-[12px] outline-none focus:border-[var(--brand-primary)] transition-all"
+                    className="w-full clay-card rounded-xl pl-9 pr-3 py-2.5 text-[12px] outline-none focus:ring-2 focus:ring-[var(--brand-primary)]/10 transition-all"
                   />
                 </div>
               </div>
@@ -412,7 +406,7 @@ function GPSReportPage() {
                     required
                     value={logoutDate}
                     onChange={(e) => setLogoutDate(e.target.value)}
-                    className="w-full rounded-xl border border-gray-100 bg-gray-50 pl-9 pr-3 py-2.5 text-[12px] outline-none focus:border-[var(--brand-primary)] transition-all"
+                    className="w-full clay-card rounded-xl pl-9 pr-3 py-2.5 text-[12px] outline-none focus:ring-2 focus:ring-[var(--brand-primary)]/10 transition-all"
                   />
                 </div>
               </div>
@@ -420,9 +414,9 @@ function GPSReportPage() {
           </div>
 
           {/* GPS Location */}
-          <div className="bg-white rounded-2xl border border-gray-100 p-4 shadow-sm">
+          <div className="clay-card p-4">
             <div className="flex items-center gap-3 mb-4">
-              <div className="w-10 h-10 rounded-[14px] bg-[#FDF4E7] flex items-center justify-center flex-shrink-0">
+              <div className="clay-icon w-10 h-10 rounded-[14px] bg-[#FDF4E7] flex items-center justify-center flex-shrink-0">
                 <MapPin size={18} className="text-[#A0611A]" />
               </div>
               <div className="flex-1">
@@ -463,7 +457,7 @@ function GPSReportPage() {
                 type="button"
                 onClick={getCurrentLocation}
                 disabled={gettingLocation}
-                className="w-full py-3 rounded-xl bg-[var(--brand-primary)] text-white font-semibold text-[13px] flex items-center justify-center gap-2 hover:bg-[var(--brand-primary-hover)] transition-all disabled:opacity-50"
+                className="clay-btn w-full py-3 rounded-xl bg-[var(--brand-primary)] text-white font-semibold text-[13px] flex items-center justify-center gap-2 transition-all disabled:opacity-50"
               >
                 {gettingLocation ? (
                   <>
@@ -481,9 +475,9 @@ function GPSReportPage() {
           </div>
 
           {/* Remarks */}
-          <div className="bg-white rounded-2xl border border-gray-100 p-4 shadow-sm">
+          <div className="clay-card p-4">
             <div className="flex items-center gap-3 mb-4">
-              <div className="w-10 h-10 rounded-[14px] bg-gray-50 flex items-center justify-center flex-shrink-0">
+              <div className="clay-icon w-10 h-10 rounded-[14px] bg-gray-50 flex items-center justify-center flex-shrink-0">
                 <FileText size={18} className="text-gray-500" />
               </div>
               <div>
@@ -502,7 +496,7 @@ function GPSReportPage() {
               placeholder="e.g., Site visit with poor/no internet connection. Client meeting at remote location."
               rows={4}
               required
-              className="w-full rounded-xl border border-gray-100 bg-gray-50 px-4 py-3 text-[13px] outline-none focus:border-[var(--brand-primary)] transition-all resize-none"
+              className="w-full clay-card rounded-xl px-4 py-3 text-[13px] outline-none focus:ring-2 focus:ring-[var(--brand-primary)]/10 transition-all resize-none"
             />
           </div>
 
@@ -510,7 +504,7 @@ function GPSReportPage() {
           <button
             type="submit"
             disabled={submitting}
-            className="w-full py-4 rounded-2xl bg-[var(--brand-primary)] text-white font-bold text-[14px] flex items-center justify-center gap-2 hover:bg-[var(--brand-primary-hover)] active:scale-[0.98] transition-all disabled:opacity-50 shadow-lg shadow-red-100"
+            className="clay-btn w-full py-4 rounded-2xl bg-[var(--brand-primary)] text-white font-bold text-[14px] flex items-center justify-center gap-2 active:scale-[0.98] transition-all disabled:opacity-50"
           >
             {submitting ? (
               <>

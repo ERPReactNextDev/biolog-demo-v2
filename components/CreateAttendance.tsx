@@ -322,13 +322,13 @@ const basePayload = {
 
   return (
     <Dialog open={open} onOpenChange={onOpenChangeAction}>
-      <DialogContent className="p-0 rounded-[28px] max-w-sm w-full mx-auto overflow-hidden border-0 shadow-2xl max-h-[92vh] flex flex-col">
+      <DialogContent className="p-0 rounded-[28px] max-w-sm w-full mx-auto overflow-hidden border-0 shadow-[0_8px_40px_rgba(0,0,0,0.18)] max-h-[92vh] flex flex-col">
         <VisuallyHidden>
           <DialogTitle>Create Attendance</DialogTitle>
         </VisuallyHidden>
 
         {/* ── Header ── */}
-        <div className="bg-brand-primary px-6 pt-5 pb-6 flex-shrink-0">
+        <div className="clay-card-brand rounded-none px-6 pt-5 pb-6 flex-shrink-0">
           <div className="flex items-center gap-3 mb-5">
             <button
               onClick={() => onOpenChangeAction(false)}
@@ -352,12 +352,12 @@ const basePayload = {
         </div>
 
         {/* ── Body ── */}
-        <div className="overflow-y-auto flex-1 bg-brand-bg">
+        <div className="overflow-y-auto flex-1 clay-bg">
           <div className="flex flex-col gap-4 p-5">
 
             {/* Current Status Banner */}
             {lastStatus && (
-              <div className={`rounded-2xl border px-4 py-3 flex items-center gap-3 ${lastStatus === "Login" ? "bg-[#EEF7F2] border-green-200" : "bg-brand-light border-red-200"}`}>
+              <div className={`clay-card px-4 py-3 flex items-center gap-3 ${lastStatus === "Login" ? "bg-[#EEF7F2]" : "bg-[var(--brand-light)]"}`}>
                 {lastStatus === "Login"
                   ? <CheckCircle2 size={18} className="text-[#1A7A4A] flex-shrink-0" />
                   : <AlertCircle size={18} className="text-brand-primary flex-shrink-0" />}
@@ -398,7 +398,7 @@ const basePayload = {
                     <button
                       onClick={() => onChangeAction("Status", "Login")}
                       disabled={lastStatus === "Login"}
-                      className={`rounded-2xl border-[1.5px] p-4 flex flex-col items-center gap-2 transition-all ${
+                      className={`clay-card p-4 flex flex-col items-center gap-2 transition-all active:scale-95 ${
                         formData.Status === "Login" ? "bg-[#EEF7F2] border-[#1A7A4A]" : "bg-white border-gray-200 hover:border-gray-300"
                       } ${lastStatus === "Login" ? "opacity-40 cursor-not-allowed" : "cursor-pointer"}`}
                     >
@@ -409,7 +409,7 @@ const basePayload = {
                     <button
                       onClick={() => onChangeAction("Status", "Logout")}
                       disabled={lastStatus === "Logout"}
-                      className={`rounded-2xl border-[1.5px] p-4 flex flex-col items-center gap-2 transition-all ${
+                      className={`clay-card p-4 flex flex-col items-center gap-2 transition-all active:scale-95 ${
                         formData.Status === "Logout" ? "bg-brand-light border-brand-primary" : "bg-white border-gray-200 hover:border-gray-300"
                       } ${lastStatus === "Logout" ? "opacity-40 cursor-not-allowed" : "cursor-pointer"}`}
                     >
@@ -430,15 +430,15 @@ const basePayload = {
                     onChange={(e) => onChangeAction("Remarks", e.target.value)}
                     placeholder="Add notes or remarks (optional)..."
                     rows={3}
-                    className="w-full rounded-2xl border border-gray-200 bg-white px-4 py-3 text-[13px] text-gray-800 placeholder:text-gray-300 resize-none outline-none focus:border-brand-primary focus:ring-2 focus:ring-brand-primary/10 transition-all"
+                    className="w-full clay-card px-4 py-3 text-[13px] text-gray-800 placeholder:text-gray-300 resize-none outline-none focus:ring-2 focus:ring-[var(--brand-primary)]/10 transition-all"
                   />
                 </div>
 
                 {/* Location */}
                 <div>
                   <p className="text-[11px] font-semibold text-gray-400 uppercase tracking-widest mb-2">Location</p>
-                  <div className="rounded-2xl border border-gray-200 bg-white p-4 flex gap-3 items-start">
-                    <div className="w-9 h-9 rounded-xl bg-brand-light flex items-center justify-center flex-shrink-0">
+                  <div className="clay-card p-4 flex gap-3 items-start">
+                    <div className="clay-icon w-9 h-9 rounded-xl bg-[var(--brand-light)] flex items-center justify-center flex-shrink-0">
                       <MapPin size={16} className="text-brand-primary" />
                     </div>
                     <div className="flex-1 min-w-0">
@@ -491,7 +491,7 @@ const basePayload = {
                   disabled={isSubmitDisabled}
                   className={`w-full rounded-2xl py-4 text-[15px] font-semibold flex items-center justify-center gap-2 transition-all ${
                     isSubmitDisabled
-                      ? "bg-gray-100 text-gray-300 cursor-not-allowed" :"bg-brand-primary text-white hover:bg-brand-primary-hover active:scale-[0.98] shadow-lg shadow-brand-primary/20"
+                      ? "bg-gray-100 text-gray-300 cursor-not-allowed" :"clay-btn bg-[var(--brand-primary)] text-white active:scale-[0.98]"
                   }`}
                 >
                   {loading ? (

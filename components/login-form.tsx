@@ -124,7 +124,7 @@ function SignUpDialog({ open, onClose }: { open: boolean; onClose: () => void })
       onClick={(e) => { if (e.target === e.currentTarget) handleClose(); }}
     >
       <div
-        className="relative w-full max-w-lg bg-white rounded-[2.5rem] shadow-2xl overflow-hidden animate-in fade-in zoom-in-95 duration-200"
+        className="clay-card relative w-full max-w-lg rounded-[2.5rem] overflow-hidden animate-in fade-in zoom-in-95 duration-200"
         style={{ maxHeight: "90vh", overflowY: "auto" }}
       >
         {/* Close */}
@@ -155,7 +155,7 @@ function SignUpDialog({ open, onClose }: { open: boolean; onClose: () => void })
             </div>
             <button
               onClick={handleClose}
-              className="w-full rounded-2xl py-3.5 text-sm font-bold bg-brand-primary text-white hover:bg-brand-primary-hover transition-all active:scale-[0.98]"
+              className="clay-btn w-full rounded-2xl py-3.5 text-sm font-bold bg-[var(--brand-primary)] text-white transition-all active:scale-[0.98]"
             >
               Back to Login
             </button>
@@ -303,7 +303,7 @@ function SignUpDialog({ open, onClose }: { open: boolean; onClose: () => void })
                 </button>
                 <button
                   type="submit" disabled={submitting}
-                  className="flex-1 rounded-2xl py-3.5 text-sm font-bold text-white bg-brand-primary hover:bg-brand-primary-hover transition-all active:scale-[0.98] disabled:opacity-60 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+                  className="clay-btn flex-1 rounded-2xl py-3.5 text-sm font-bold text-white bg-[var(--brand-primary)] transition-all active:scale-[0.98] disabled:opacity-60 disabled:cursor-not-allowed flex items-center justify-center gap-2"
                 >
                   {submitting ? (
                     <span className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
@@ -695,7 +695,7 @@ export function LoginForm({
         </div>
 
         {/* ── Right Panel — Login Form ── */}
-        <div className="flex-1 flex flex-col items-center justify-center bg-brand-bg px-6 py-12 relative">
+        <div className="flex-1 flex flex-col items-center justify-center clay-bg px-6 py-12 relative">
 
           {/* Mobile logo */}
           <div className="lg:hidden flex items-center gap-2 mb-10">
@@ -738,7 +738,7 @@ export function LoginForm({
                   onChange={(e) => setEmail(e.target.value)}
                   placeholder="you@acculog.com"
                   required autoComplete="email" disabled={loading}
-                  className="w-full rounded-2xl border border-gray-200 bg-white px-4 py-3.5 text-[14px] text-gray-900 placeholder:text-gray-300 outline-none focus:border-brand-primary focus:ring-2 focus:ring-brand-primary/10 transition-all"
+                  className="w-full clay-card px-4 py-3.5 text-[14px] text-gray-900 placeholder:text-gray-300 outline-none focus:ring-2 focus:ring-[var(--brand-primary)]/10 transition-all"
                 />
               </div>
 
@@ -752,7 +752,7 @@ export function LoginForm({
                     id="otp" type="text" maxLength={6}
                     value={otp} onChange={(e) => setOtp(e.target.value.replace(/\D/g, ""))}
                     placeholder="Enter 6-digit code" required disabled={loading}
-                    className="w-full rounded-2xl border-2 border-brand-primary/20 bg-white px-4 py-3.5 text-center text-[20px] font-bold tracking-[8px] text-gray-900 placeholder:text-gray-300 placeholder:tracking-normal outline-none focus:border-brand-primary focus:ring-4 focus:ring-brand-primary/5 transition-all"
+                    className="w-full clay-card px-4 py-3.5 text-center text-[20px] font-bold tracking-[8px] text-gray-900 placeholder:text-gray-300 placeholder:tracking-normal outline-none focus:ring-4 focus:ring-[var(--brand-primary)]/5 transition-all"
                   />
                   <p className="text-[11px] text-gray-400 text-center">Enter 6-digit code from authenticator app</p>
                 </div>
@@ -769,7 +769,7 @@ export function LoginForm({
                       id="password" type={showPassword ? "text" : "password"}
                       value={Password} onChange={(e) => setPassword(e.target.value)}
                       placeholder="Enter your password" required autoComplete="current-password" disabled={loading}
-                      className="w-full rounded-2xl border border-gray-200 bg-white px-4 py-3.5 pr-12 text-[14px] text-gray-900 placeholder:text-gray-300 outline-none focus:border-brand-primary focus:ring-2 focus:ring-brand-primary/10 transition-all"
+                      className="w-full clay-card px-4 py-3.5 pr-12 text-[14px] text-gray-900 placeholder:text-gray-300 outline-none focus:ring-2 focus:ring-[var(--brand-primary)]/10 transition-all"
                     />
                     <button
                       type="button" tabIndex={-1}
@@ -788,7 +788,7 @@ export function LoginForm({
                 className={[
                   "mt-2 w-full rounded-2xl py-4 text-[15px] font-semibold flex items-center justify-center gap-2 transition-all",
                   loading || biometricLoading
-                    ? "bg-gray-100 text-gray-300 cursor-not-allowed" :"bg-brand-primary text-white hover:bg-brand-primary-hover active:scale-[0.98] shadow-lg shadow-brand-primary/20",
+                    ? "bg-gray-100 text-gray-300 cursor-not-allowed" :"clay-btn bg-[var(--brand-primary)] text-white active:scale-[0.98]",
                 ].join(" ")}
               >
                 {loading ? (
@@ -843,7 +843,7 @@ export function LoginForm({
                     className={[
                       "w-full rounded-2xl py-4 text-[15px] font-semibold flex items-center justify-center gap-2 transition-all border border-gray-200",
                       loading || biometricLoading || googleLoginLoading || !isOnline
-                        ? "bg-gray-50 text-gray-300 cursor-not-allowed" :"bg-white text-gray-700 hover:bg-gray-50 active:scale-[0.98] hover:border-gray-300",
+                        ? "bg-gray-50 text-gray-300 cursor-not-allowed" :"clay-card bg-white text-gray-700 active:scale-[0.98]",
                     ].join(" ")}
                   >
                     {googleLoginLoading ? (
@@ -863,7 +863,7 @@ export function LoginForm({
                     className={[
                       "w-full rounded-2xl py-4 text-[15px] font-semibold flex items-center justify-center gap-2 transition-all border border-gray-200",
                       loading || biometricLoading || googleLoginLoading || !isOnline
-                        ? "bg-gray-50 text-gray-300 cursor-not-allowed" :"bg-white text-gray-700 hover:bg-gray-50 active:scale-[0.98] hover:border-gray-300",
+                        ? "bg-gray-50 text-gray-300 cursor-not-allowed" :"clay-card bg-white text-gray-700 active:scale-[0.98]",
                     ].join(" ")}
                   >
                     {biometricLoading ? (
