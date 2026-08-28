@@ -3574,7 +3574,7 @@ const today = phTodayAsLocalDate();
           userDetails={userDetails}
         />;
       case "messaging":
-        return <MessagingPage />;
+        return <MessagingPage referenceId={userDetails?.ReferenceID ?? ""} />;
       case "reports":
         return <ReportsTab monthlyStats={monthlyStats} allLogs={allVisibleAccounts} userId={userId} userDetails={userDetails} />;
       case "profile":

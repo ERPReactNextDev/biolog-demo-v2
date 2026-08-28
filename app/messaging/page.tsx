@@ -4,7 +4,6 @@ import { useEffect, useState, useCallback } from "react";
 import { toast } from "sonner";
 import { ArrowLeft, PencilLine } from "lucide-react";
 import { AnimatePresence, motion } from "framer-motion";
-import { useUser } from "@/contexts/UserContext";
 import { useSocket } from "@/hooks/useSocket";
 import { useWebRTC } from "@/hooks/useWebRTC";
 import ConversationItem, {
@@ -17,9 +16,12 @@ import { NewConversationModal } from "@/components/messaging/NewConversationModa
 import { getUserFullName } from "@/lib/types";
 import type { Conversation, Message } from "@/lib/types";
 
-export default function MessagingPage() {
-  const { userId } = useUser();
-  const { socket } = useSocket(userId);
+interface MessagingPageProps {
+  referenceId: string;
+}
+
+export default function MessagingPage({ referenceId }: MessagingPageProps) {
+  const { socket } = useSocket(referenceId);
   const {
     localStream,
     remoteStream,
@@ -31,7 +33,7 @@ export default function MessagingPage() {
     handleAnswer,
     handleIceCandidate,
     endCall,
-  } = useWebRTC(socket, userId ?? "");
+  } = useWebRTC(socket, referenceId);
 
   const [view, setView] = useState<"list" | "thread">("list");
   const [conversations, setConversations] = useState<ConversationWithParticipants[]>([]);
@@ -46,10 +48,10 @@ export default function MessagingPage() {
   } | null>(null);
 
   const fetchConversations = useCallback(() => {
-    if (!userId) return;
+    if (!referenceId) return;
     setLoading(true);
     setFetchError(null);
-    fetch(`/api/conversations?referenceId=${encodeURIComponent(userId)}`)
+    fetch(`/api/conversations?referenceId=${encodeURIComponent(referenceId)}`)
       .then((res) =>
         res.ok
           ? res.json()
@@ -60,7 +62,7 @@ export default function MessagingPage() {
       .then((data: ConversationWithParticipants[]) => setConversations(data))
       .catch((err: unknown) => setFetchError(String(err)))
       .finally(() => setLoading(false));
-  }, [userId]);
+  }, [referenceId]);
 
   useEffect(() => {
     fetchConversations();
@@ -123,7 +125,7 @@ export default function MessagingPage() {
 
   const filtered = filterQuery.trim()
     ? conversations.filter((c) => {
-        const other = c.participants?.find((p) => p.user_id !== userId);
+        const other = c.participants?.find((p) => p.user_id !== referenceId);
         const name =
           c.conversation_type === "direct" && other?.user
             ? getUserFullName(other.user)
@@ -254,7 +256,7 @@ export default function MessagingPage() {
                   <ConversationItem
                     key={conv.id}
                     conversation={conv}
-                    currentUserId={userId ?? ""}
+                    currentUserId={referenceId}
                     isSelected={selected?.id === conv.id}
                     onClick={() => {
                       setSelected(conv);
@@ -293,7 +295,7 @@ export default function MessagingPage() {
             <div className="flex-1 min-h-0 overflow-hidden">
               <MessageThread
                 conversation={selected}
-                currentUserId={userId ?? ""}
+                currentUserId={referenceId}
                 socket={socket}
                 onStartCall={startCall}
               />
@@ -326,7 +328,7 @@ export default function MessagingPage() {
       )}
       {showNewModal && (
         <NewConversationModal
-          currentUserId={userId ?? ""}
+          currentUserId={referenceId}
           onClose={() => setShowNewModal(false)}
           onConversationCreated={handleConversationCreated}
         />
