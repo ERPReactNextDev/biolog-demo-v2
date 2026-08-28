@@ -46,9 +46,9 @@ export default function TypingIndicator({ senderName }: TypingIndicatorProps) {
             variants={dotVariants}
             transition={{
               duration: 0.35,
-              ease: "easeInOut",
+              ease: "easeInOut" as const,
               repeat: Infinity,
-              repeatType: "reverse",
+              repeatType: "reverse" as const,
             }}
           />
         ))}

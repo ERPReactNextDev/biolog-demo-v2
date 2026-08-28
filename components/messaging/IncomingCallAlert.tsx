@@ -48,7 +48,7 @@ const pulseRingVariants = {
     transition: {
       duration: 1.5,
       repeat: Infinity,
-      ease: "easeOut",
+      ease: "easeOut" as const,
     },
   },
 };
