@@ -3824,12 +3824,12 @@ const today = phTodayAsLocalDate();
 function MeetingDetailsDialog({ open, onOpenChange, meeting, usersMap }: { 
   open: boolean; onOpenChange: (open: boolean) => void; meeting: Meeting | null; usersMap: Record<string, UserInfo>;
 }) {
-  if (!meeting) return null;
-  const user = usersMap[meeting.ReferenceID];
+  const user = meeting ? usersMap[meeting.ReferenceID] : undefined;
   
   // Use reverse geocoding for coordinate-based locations
-  const { displayLocation, isResolving, isCoords, originalCoords } = useResolvedLocation(meeting.Location, meeting.Latitude, meeting.Longitude);
+  const { displayLocation, isResolving, isCoords, originalCoords } = useResolvedLocation(meeting?.Location, meeting?.Latitude, meeting?.Longitude);
   
+  if (!meeting) return null;
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="p-0 rounded-[28px] max-w-sm w-full mx-auto overflow-hidden border-0 shadow-2xl">

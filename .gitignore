@@ -43,3 +43,6 @@ next-env.d.ts
 # Google OAuth secrets
 client_secret_*.json
 .env
+
+# Offline backup data (per-user JSON files)
+/data/offline-backups/

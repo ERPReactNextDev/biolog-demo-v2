@@ -368,7 +368,7 @@ export default function CreateSalesAttendance({
     if (formData.Status === "Logout" && clientType === "Existing Client" && !formData.SiteVisitAccount) {
       return toast.error("Please select a company.");
     }
-    if (locationAddress === "Fetching location...") return toast.error("Location not ready yet.");
+
 
     // Save the new status to cache immediately for offline use
     const newStatus = formData.Status;
@@ -494,11 +494,9 @@ export default function CreateSalesAttendance({
     loading ||
     !capturedImage ||
     loadingStatus ||
-    locationAddress === "Fetching location..." ||
-    locationAddress.includes("unavailable") ||
     (formData.Status === "Logout" && !clientType) ||
     (formData.Status === "Logout" && clientType === "Existing Client" && !formData.SiteVisitAccount) ||
-    (formData.Status === "Logout" && clientType === "New Client" && (!formData.company_name || !formData.address));
+    (formData.Status === "Logout" && clientType === "New Client" && !formData.company_name);
 
   /* ── Render ── */
   return (

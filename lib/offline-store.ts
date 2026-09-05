@@ -1,56 +1,23 @@
 // lib/offline-store.ts
 // IndexedDB-based offline queue for activity logs
+// + server-side JSON file backup as second durability layer
 
 const DB_NAME    = "acculog-offline";
 const DB_VERSION = 2;
 const STORE_NAME = "pending-logs";
 
-// ── Global sync lock ──────────────────────────────────────────────────────────
-//
-// Prevents duplicate processing when both OfflineStatusProvider (app-level
-// sync loop) and useOfflineSync (page-level hook) are active simultaneously.
-// Only one sync loop may hold this lock at a time; the other will find an
-// empty queue or see the lock taken and return without submitting duplicates.
-
+// -- Global sync lock ----------------------------------------------------------
 let _globalSyncLocked = false;
 
-/**
- * Attempt to acquire the global sync lock.
- * Returns `true` if the lock was acquired (caller may proceed with sync).
- * Returns `false` if another sync is already in progress (caller must skip).
- */
 export function acquireSyncLock(): boolean {
   if (_globalSyncLocked) return false;
   _globalSyncLocked = true;
   return true;
 }
-
-/**
- * Release the global sync lock so the next sync attempt can proceed.
- * Always call this in a `finally` block after sync completes or errors.
- */
-export function releaseSyncLock(): void {
-  _globalSyncLocked = false;
-}
-
-/**
- * Returns `true` if the global sync lock is currently held.
- * Useful for skipping redundant sync attempts without acquiring the lock.
- */
-export function isSyncLocked(): boolean {
-  return _globalSyncLocked;
-}
-
-/**
- * Reset the global sync lock to its initial (unlocked) state.
- * Intended for use in test `beforeEach` / `afterEach` hooks to prevent
- * stale lock state from leaking between tests.
- *
- * @internal Do not call in production code.
- */
-export function resetSyncLock(): void {
-  _globalSyncLocked = false;
-}
+export function releaseSyncLock(): void { _globalSyncLocked = false; }
+export function isSyncLocked(): boolean { return _globalSyncLocked; }
+/** @internal test use only */
+export function resetSyncLock(): void { _globalSyncLocked = false; }
 
 export interface PendingLog {
   id: string;
@@ -59,8 +26,7 @@ export interface PendingLog {
   retries: number;
 }
 
-// ── Generic CRUD record shape ─────────────────────────────────────────────────
-
+// -- Generic CRUD record shape -------------------------------------------------
 export interface StoreRecord<T> {
   _key: string;
   _value: T;
@@ -69,8 +35,7 @@ export interface StoreRecord<T> {
   _expiresAt: number | null;
 }
 
-// ── DB helper ─────────────────────────────────────────────────────────────────
-
+// -- DB helper -----------------------------------------------------------------
 function openDB(): Promise<IDBDatabase> {
   return new Promise((resolve, reject) => {
     if (typeof indexedDB === "undefined") {
@@ -94,7 +59,45 @@ function openDB(): Promise<IDBDatabase> {
   });
 }
 
-// ── Public API ────────────────────────────────────────────────────────────────
+// -- Backup helpers ------------------------------------------------------------
+// Extract ReferenceID from a log payload for per-user backup files.
+function getReferenceId(payload: Record<string, unknown>): string | null {
+  const ref = payload.ReferenceID;
+  return typeof ref === "string" && ref.trim() ? ref.trim() : null;
+}
+
+/** Fire-and-forget: write a log entry to the server-side JSON backup. */
+function backupToServer(entry: PendingLog): void {
+  const ref = getReferenceId(entry.payload);
+  if (!ref) return;
+
+  fetch("/api/offline-backup", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      id:          entry.id,
+      referenceId: ref,
+      payload:     entry.payload,
+      createdAt:   entry.createdAt,
+      retries:     entry.retries,
+    }),
+  }).catch(() => {
+    // Non-critical - IndexedDB remains the primary store.
+    // If the server is unreachable (truly offline) this is expected.
+  });
+}
+
+/** Fire-and-forget: remove a synced log from the server-side JSON backup. */
+function removeBackup(id: string, payload: Record<string, unknown>): void {
+  const ref = getReferenceId(payload);
+  if (!ref) return;
+
+  fetch(`/api/offline-backup?id=${encodeURIComponent(id)}&ref=${encodeURIComponent(ref)}`, {
+    method: "DELETE",
+  }).catch(() => { /* non-critical */ });
+}
+
+// -- Public API ----------------------------------------------------------------
 
 /** Add a log payload to the offline queue. Returns the generated id. */
 export async function enqueuePendingLog(
@@ -104,8 +107,6 @@ export async function enqueuePendingLog(
   const id  = `log_${Date.now()}_${Math.random().toString(36).slice(2, 9)}`;
   const now = Date.now();
 
-  // Stamp the original submission time into the payload so the API can
-  // use it as date_created instead of the sync time.
   const stampedPayload = {
     ...payload,
     date_created: payload.date_created ?? new Date(now).toISOString(),
@@ -113,15 +114,20 @@ export async function enqueuePendingLog(
 
   const entry: PendingLog = { id, payload: stampedPayload, createdAt: now, retries: 0 };
 
-  return new Promise((resolve, reject) => {
+  await new Promise<void>((resolve, reject) => {
     const tx    = db.transaction(STORE_NAME, "readwrite");
     const store = tx.objectStore(STORE_NAME);
     const req   = store.add(entry);
 
-    tx.oncomplete = () => { db.close(); resolve(id); };
+    tx.oncomplete = () => { db.close(); resolve(); };
     tx.onerror    = () => { db.close(); reject(tx.error); };
     req.onerror   = () => reject(req.error);
   });
+
+  // Second layer: also write to server-side JSON backup
+  backupToServer(entry);
+
+  return id;
 }
 
 /** Return all queued logs sorted oldest-first. */
@@ -143,11 +149,29 @@ export async function getAllPendingLogs(): Promise<PendingLog[]> {
   });
 }
 
-/** Remove a successfully-synced log. */
+/** Remove a successfully-synced log from both IndexedDB and the server backup. */
 export async function removePendingLog(id: string): Promise<void> {
-  const db = await openDB();
+  // We need the payload to know the referenceId for backup removal.
+  // Read first, then delete.
+  let payload: Record<string, unknown> | null = null;
+  try {
+    const db = await openDB();
+    payload = await new Promise<Record<string, unknown> | null>((resolve) => {
+      const tx    = db.transaction(STORE_NAME, "readonly");
+      const store = tx.objectStore(STORE_NAME);
+      const req   = store.get(id);
+      req.onsuccess = () => {
+        db.close();
+        const entry = req.result as PendingLog | undefined;
+        resolve(entry?.payload ?? null);
+      };
+      req.onerror = () => { db.close(); resolve(null); };
+    });
+  } catch { /* continue to delete even if read fails */ }
 
-  return new Promise((resolve, reject) => {
+  // Delete from IndexedDB
+  const db = await openDB();
+  await new Promise<void>((resolve, reject) => {
     const tx    = db.transaction(STORE_NAME, "readwrite");
     const store = tx.objectStore(STORE_NAME);
     const req   = store.delete(id);
@@ -156,6 +180,9 @@ export async function removePendingLog(id: string): Promise<void> {
     tx.onerror    = () => { db.close(); reject(tx.error); };
     req.onerror   = () => reject(req.error);
   });
+
+  // Remove from server backup (fire-and-forget)
+  if (payload) removeBackup(id, payload);
 }
 
 /** Bump the retry counter for a failed log. */
@@ -196,7 +223,7 @@ export async function getPendingCount(): Promise<number> {
   });
 }
 
-/** Clear all pending logs from the queue. */
+/** Clear all pending logs from the queue (does NOT clear server backup). */
 export async function clearAllPendingLogs(): Promise<void> {
   const db = await openDB();
 
@@ -211,18 +238,71 @@ export async function clearAllPendingLogs(): Promise<void> {
   });
 }
 
-// ── Generic getItem / setItem ─────────────────────────────────────────────────
-
 /**
- * Read a value from any IDB object store by key.
- * Returns `null` if the record does not exist, has expired, or IDB is unavailable.
+ * Reconcile IndexedDB with the server-side JSON backup.
+ * Fetches the backup for a given user and re-enqueues any logs that are
+ * missing from IndexedDB (e.g. after browser cleared site data).
+ * Returns the number of logs recovered.
  */
+export async function reconcileFromBackup(referenceId: string): Promise<number> {
+  if (!referenceId) return 0;
+
+  let backupLogs: PendingLog[] = [];
+  try {
+    const res = await fetch(`/api/offline-backup?ref=${encodeURIComponent(referenceId)}`);
+    if (!res.ok) return 0;
+    const json = await res.json();
+    backupLogs = Array.isArray(json.logs) ? json.logs : [];
+  } catch {
+    return 0;
+  }
+
+  if (backupLogs.length === 0) return 0;
+
+  // Get current IDB ids
+  let idbLogs: PendingLog[] = [];
+  try {
+    idbLogs = await getAllPendingLogs();
+  } catch { /* IDB unavailable */ }
+
+  const idbIds = new Set(idbLogs.map((l) => l.id));
+
+  let recovered = 0;
+  for (const backupEntry of backupLogs) {
+    if (idbIds.has(backupEntry.id)) continue; // already in IDB
+
+    // Re-insert the missing entry into IndexedDB
+    try {
+      const db = await openDB();
+      await new Promise<void>((resolve) => {
+        const tx    = db.transaction(STORE_NAME, "readwrite");
+        const store = tx.objectStore(STORE_NAME);
+        // Use put (not add) to avoid duplicate key errors on concurrent calls
+        store.put({
+          id:        backupEntry.id,
+          payload:   backupEntry.payload,
+          createdAt: backupEntry.createdAt ?? Date.now(),
+          retries:   backupEntry.retries ?? 0,
+        });
+        tx.oncomplete = () => { db.close(); resolve(); };
+        tx.onerror    = () => { db.close(); resolve(); };
+      });
+      recovered++;
+      console.log(`[offline-store] Recovered log ${backupEntry.id} from server backup`);
+    } catch { /* skip individual failures */ }
+  }
+
+  return recovered;
+}
+
+// -- Generic getItem / setItem -------------------------------------------------
+
 export async function getItem<T>(store: string, key: string): Promise<T | null> {
   try {
     const db = await openDB();
 
     return new Promise<T | null>((resolve) => {
-      const tx      = db.transaction(store, "readonly");
+      const tx       = db.transaction(store, "readonly");
       const objStore = tx.objectStore(store);
       const req      = objStore.get(key);
 
@@ -245,11 +325,6 @@ export async function getItem<T>(store: string, key: string): Promise<T | null> 
   }
 }
 
-/**
- * Write a value to any IDB object store.
- * Increments `_version` on each write for conflict detection.
- * Silent no-op when IndexedDB is unavailable.
- */
 export async function setItem<T>(
   store: string,
   key: string,
@@ -260,70 +335,51 @@ export async function setItem<T>(
     const db = await openDB();
 
     return new Promise<void>((resolve) => {
-      // First read the existing record to get the current _version.
-      const readTx      = db.transaction(store, "readonly");
-      const readStore   = readTx.objectStore(store);
-      const readReq     = readStore.get(key);
+      const readTx    = db.transaction(store, "readonly");
+      const readStore = readTx.objectStore(store);
+      const readReq   = readStore.get(key);
 
       readReq.onsuccess = () => {
-        const existing = readReq.result as StoreRecord<T> | undefined;
+        const existing    = readReq.result as StoreRecord<T> | undefined;
         const nextVersion = (existing?._version ?? 0) + 1;
-        const now = Date.now();
+        const now         = Date.now();
 
         const record: StoreRecord<T> = {
-          _key: key,
-          _value: value,
-          _version: nextVersion,
+          _key:       key,
+          _value:     value,
+          _version:   nextVersion,
           _createdAt: now,
           _expiresAt: ttlMs != null ? now + ttlMs : null,
         };
 
-        // Now open a readwrite transaction to persist.
         const writeTx    = db.transaction(store, "readwrite");
         const writeStore = writeTx.objectStore(store);
-        const putReq     = writeStore.put(record);
+        writeStore.put(record);
 
         writeTx.oncomplete = () => { db.close(); resolve(); };
-        writeTx.onerror    = () => { db.close(); resolve(); }; // silent no-op on error
-        putReq.onerror     = () => { /* handled by writeTx.onerror */ };
+        writeTx.onerror    = () => { db.close(); resolve(); };
       };
 
-      readTx.onerror = () => { db.close(); resolve(); }; // silent no-op on error
+      readTx.onerror = () => { db.close(); resolve(); };
     });
-  } catch {
-    // Silent no-op when IndexedDB is unavailable
-  }
+  } catch { /* silent no-op */ }
 }
 
-// ── deleteItem / getAllItems / runExpiry / withTransaction ─────────────────────
-
-/**
- * Delete a value from any IDB object store by key.
- * Silent no-op when IndexedDB is unavailable or an error occurs.
- */
 export async function deleteItem(store: string, key: string): Promise<void> {
   try {
     const db = await openDB();
 
     return new Promise<void>((resolve) => {
-      const tx      = db.transaction(store, "readwrite");
+      const tx       = db.transaction(store, "readwrite");
       const objStore = tx.objectStore(store);
-      const req      = objStore.delete(key);
+      objStore.delete(key);
 
       tx.oncomplete = () => { db.close(); resolve(); };
-      tx.onerror    = () => { db.close(); resolve(); }; // silent no-op on error
-      req.onerror   = () => { /* handled by tx.onerror */ };
+      tx.onerror    = () => { db.close(); resolve(); };
     });
-  } catch {
-    // Silent no-op when IndexedDB is unavailable
-  }
+  } catch { /* silent no-op */ }
 }
 
-/**
- * Return all non-expired values from any IDB object store.
- * Excludes records where `_expiresAt` is set and `<= Date.now()`.
- * Falls back to `[]` on error.
- */
 export async function getAllItems<T>(store: string): Promise<T[]> {
   try {
     const db = await openDB();
@@ -337,12 +393,11 @@ export async function getAllItems<T>(store: string): Promise<T[]> {
         db.close();
         const now = Date.now();
         const records = req.result as StoreRecord<T>[];
-        const values = records
-          .filter(
-            (r) => r._expiresAt === null || r._expiresAt > now
-          )
-          .map((r) => r._value);
-        resolve(values);
+        resolve(
+          records
+            .filter((r) => r._expiresAt === null || r._expiresAt > now)
+            .map((r) => r._value)
+        );
       };
 
       req.onerror = () => { db.close(); resolve([]); };
@@ -353,11 +408,6 @@ export async function getAllItems<T>(store: string): Promise<T[]> {
   }
 }
 
-/**
- * Delete all expired records from any IDB object store.
- * Iterates via a cursor and removes entries where `_expiresAt !== null && _expiresAt <= Date.now()`.
- * Silent no-op when IndexedDB is unavailable.
- */
 export async function runExpiry(store: string): Promise<void> {
   try {
     const db = await openDB();
@@ -369,32 +419,20 @@ export async function runExpiry(store: string): Promise<void> {
 
       req.onsuccess = () => {
         const cursor = req.result;
-        if (!cursor) return; // no more records
-
+        if (!cursor) return;
         const record = cursor.value as StoreRecord<unknown>;
-        const now = Date.now();
-
-        if (record._expiresAt !== null && record._expiresAt <= now) {
+        if (record._expiresAt !== null && record._expiresAt <= Date.now()) {
           cursor.delete();
         }
-
         cursor.continue();
       };
 
       tx.oncomplete = () => { db.close(); resolve(); };
-      tx.onerror    = () => { db.close(); resolve(); }; // silent no-op on error
-      req.onerror   = () => { /* handled by tx.onerror */ };
+      tx.onerror    = () => { db.close(); resolve(); };
     });
-  } catch {
-    // Silent no-op when IndexedDB is unavailable
-  }
+  } catch { /* silent no-op */ }
 }
 
-/**
- * Open a single IDB transaction across multiple stores and pass it to `fn`.
- * Resolves when the transaction completes; rejects on transaction error.
- * Falls back to no-op if IndexedDB is unavailable.
- */
 export async function withTransaction(
   stores: string[],
   mode: IDBTransactionMode,
@@ -405,13 +443,9 @@ export async function withTransaction(
 
     return new Promise<void>((resolve, reject) => {
       const tx = db.transaction(stores, mode);
-
       tx.oncomplete = () => { db.close(); resolve(); };
       tx.onerror    = () => { db.close(); reject(tx.error); };
-
       fn(tx);
     });
-  } catch {
-    // Silent no-op when IndexedDB is unavailable
-  }
+  } catch { /* silent no-op */ }
 }
