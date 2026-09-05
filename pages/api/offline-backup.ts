@@ -1,13 +1,13 @@
 // pages/api/offline-backup.ts
 //
 // Server-side JSON file backup for offline pending logs.
-// Acts as a second durability layer behind IndexedDB — if the browser clears
+// Acts as a second durability layer behind IndexedDB - if the browser clears
 // IndexedDB the data survives here and gets re-enqueued on the next sync.
 //
 // Routes:
-//   POST   /api/offline-backup         — upsert a PendingLog into the backup
-//   DELETE /api/offline-backup?id=xxx  — remove a synced log from the backup
-//   GET    /api/offline-backup?ref=xxx — return all backup logs for a user
+//   POST   /api/offline-backup         - upsert a PendingLog into the backup
+//   DELETE /api/offline-backup?id=xxx  - remove a synced log from the backup
+//   GET    /api/offline-backup?ref=xxx - return all backup logs for a user
 
 import type { NextApiRequest, NextApiResponse } from "next";
 import fs from "fs";
@@ -23,7 +23,7 @@ function ensureDir() {
 }
 
 function backupFilePath(referenceId: string): string {
-  // Sanitise — only allow alphanumeric + dash/underscore in filenames
+  // Sanitise - only allow alphanumeric + dash/underscore in filenames
   const safe = referenceId.replace(/[^a-zA-Z0-9_-]/g, "_");
   return path.join(BACKUP_DIR, `${safe}.json`);
 }
